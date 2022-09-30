@@ -24,7 +24,7 @@ We wanted to setup firewal on our VM so that we can monitor incoming and outgoin
 3. `sudo systemctl stop nginx` stops the Nginx web-server
 4. `sudo systemctl restart nginx` restarts the Nginx web-server
 ## Creating the SSL Certificate
-1. We wanted to change the permissions of the ssl-private key directory, to do this we used `sudo chmod 700 /etc/ssl/private`. chmodd is called "change mode" and 700 means that the file is protected against any access from other users, while the issuing user still has full access. [Know more.](https://www.linuxtopia.org/online_books/introduction_to_linux/linux_The_chmod_command.html)
+1. We wanted to change the permissions of the ssl-private key directory, to do this we used `sudo chmod 700 /etc/ssl/private`. chmod is called "change mode" and 700 means that the file is protected against any access from other users, while the issuing user still has full access. [Know more.](https://www.linuxtopia.org/online_books/introduction_to_linux/linux_The_chmod_command.html)
 2. Next to create a self-signed key and certificate pair, we used `sudo openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout /etc/ssl/private/nginx-selfsigned.key -out /etc/ssl/certs/nginx-selfsigned.crt`
       1. openssl: Command line tool for creating OpenSSL certificates, keys etc.
       2. req: This is a subcommand.specifies that we want to use X.509 certificate signing request (CSR) management. It follows the “X.509” certificate signing request which is a a public key standard that SSL and TLS follow to for its key and certificate management.
