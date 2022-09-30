@@ -1,9 +1,9 @@
 # FCS September Milestone
 ### Group 15
-1. Sudeep
-2. Arihant
-3. Sameer
-4. Harshit
+1. Harshit Singh(2019424)
+2. Sameer(2019330)
+3. Arihant Singh(2019298)
+4. Sudeep Reddy(2019313)
 
 ## Installing Nginx on VM
 1. First we downloaded and installed updates for each outdated package and dependency on the VM using `sudo apt update`
