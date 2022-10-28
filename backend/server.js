@@ -37,7 +37,7 @@ app.get("/health", (req, res) => {
 app.get("/", checkAuth, (req, res) => {
   res.render("index.ejs");
 });
-app.get("/login", (req, res) => {
+app.get("/login", checkNotAuth, (req, res) => {
   res.render("login.ejs");
 });
 app.post(
@@ -49,7 +49,7 @@ app.post(
     failureFlash: true,
   })
 );
-app.post("/register", async (req, res) => {
+app.post("/register", checkNotAuth, async (req, res) => {
   try {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(req.body.password, salt);
@@ -71,6 +71,12 @@ app.post("/register", async (req, res) => {
 app.get("/register", (req, res) => {
   res.render("register.ejs");
 });
+app.delete('/logout', (req, res) => {
+  req.logOut((err)=>{
+    if(err) return err;
+  })
+  res.redirect('/login')
+})
 app.listen(process.env.PORT, () => {
   console.log("Server Started");
 });
