@@ -9,7 +9,7 @@ import flash from "express-flash";
 import session from "express-session";
 import methodOverride from "method-override";
 import * as role from "./constants/role.js";
-import * as roleAuth from "./controllers/role.js"
+import * as roleAuth from "./controllers/role.js";
 dotenv.config();
 const app = express();
 
@@ -37,9 +37,14 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride("_method"));
 
-app.get("/health", checkAuth, roleAuth.roleCheck(role.USER_ROLE.ADMIN), (req, res) => {
-  res.render("health.ejs");
-});
+app.get(
+  "/health",
+  checkAuth,
+  roleAuth.roleCheck(role.USER_ROLE.ADMIN),
+  (req, res) => {
+    res.render("health.ejs");
+  }
+);
 app.get("/", checkAuth, (req, res) => {
   res.render("index.ejs");
 });
