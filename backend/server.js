@@ -3,21 +3,12 @@ import dotenv from "dotenv";
 import { createDB } from "./db/schema.js";
 import * as db from "./db/queries.js";
 import * as bcrypt from "bcrypt";
-import * as auth from "./controllers/auth.js";
-import passport from "passport";
-import flash from "express-flash";
+import * as bauth from "./controllers/basicAuth.js";
 import session from "express-session";
-import methodOverride from "method-override";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
 dotenv.config();
 const app = express();
-
-auth.initialize(
-  passport,
-  (email) => db.getUserbyEmail(email),
-  (id) => db.getUserbyId(id)
-);
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -25,7 +16,6 @@ app.use(
   })
 );
 app.set("view-engine", "ejs");
-app.use(flash());
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -33,9 +23,6 @@ app.use(
     saveUninitialized: false,
   })
 );
-app.use(passport.initialize());
-app.use(passport.session());
-app.use(methodOverride("_method"));
 
 app.get(
   "/health",
@@ -51,17 +38,14 @@ app.get("/", checkAuth, (req, res) => {
 app.get("/login", checkNotAuth, (req, res) => {
   res.render("login.ejs");
 });
-app.post(
-  "/login",
-  checkNotAuth,
-  passport.authenticate("local", {
-    successRedirect: "/",
-    failureRedirect: "/login",
-    failureFlash: true,
-  })
-);
+app.post("/login", checkNotAuth, bauth.validateUser, async (req, res) => {
+  return res.redirect("/");
+});
+
 app.get("/register", (req, res) => {
-  res.render("register.ejs", { message: "" });
+  res.render("register.ejs", {
+    message: "",
+  });
 });
 app.post("/register", checkNotAuth, async (req, res) => {
   try {
@@ -94,10 +78,8 @@ app.post("/register", checkNotAuth, async (req, res) => {
   }
 });
 
-app.delete("/logout", (req, res) => {
-  req.logOut((err) => {
-    if (err) return err;
-  });
+app.post("/logout", checkAuth, (req, res) => {
+  req.session.destroy();
   res.redirect("/login");
 });
 app.listen(process.env.PORT, () => {
@@ -105,14 +87,15 @@ app.listen(process.env.PORT, () => {
 });
 
 function checkAuth(req, res, next) {
-  if (req.isAuthenticated()) {
+  if (req.session.isLoggedIn) {
     return next();
   }
+
   res.redirect("/login");
 }
 
 function checkNotAuth(req, res, next) {
-  if (req.isAuthenticated()) {
+  if (req.session.isLoggedIn) {
     return res.redirect("/");
   }
   next();
