@@ -1,9 +1,10 @@
-export function roleCheck(role) {
+export function roleCheck(roles) {
   return (req, res, next) => {
-    if (req.session.user.role != role) {
+    if (roles.includes(req.session.user.role)) {
+      next();
+    } else {
       res.status(401);
       return res.send("You dont have permission to access this!");
     }
-    next();
   };
 }

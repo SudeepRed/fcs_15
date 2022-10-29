@@ -1,0 +1,43 @@
+import { checkAuth } from "../controllers/basicAuth.js";
+import { roleCheck } from "../controllers/role.js";
+import * as roles from "../constants/role.js";
+import * as db from "../db/queries.js";
+import express from "express";
+export const router = express.Router();
+router.use(checkAuth);
+router.post(
+  "/editprofile",
+  roleCheck([
+    roles.USER_ROLE.ADMIN,
+    roles.USER_ROLE.PATIENT,
+    roles.USER_ROLE.PROFESSIONAL,
+  ]),
+  async (req, res) => {
+    let user = req.session.user;
+    const data = req.body;
+    user.name = data.name != "" ? data.name : user.name;
+    user.age = data.age != "" ? data.age : user.age;
+    user.height = data.height != "" ? data.height : user.height;
+    user.weight = data.weight != "" ? data.weight : user.weight;
+    user.address = data.address != "" ? data.address : user.address;
+    user.allergies = data.allergies != "" ? data.allergies : user.allergies;
+    try {
+      const result = await db.updateUser(user);
+      return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+router.get("/getdocuments", (req, res) => {
+  res.send("edit");
+});
+router.get("/deletedocument", (req, res) => {
+  res.send("edit");
+});
+router.get("/getorgs", (req, res) => {
+  res.send("edit");
+});
+router.get("/getmedicines", (req, res) => {
+  res.send("edit");
+});

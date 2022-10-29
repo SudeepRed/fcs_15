@@ -1,4 +1,33 @@
-<p>Hello!</p>
+<h2>hello <%= user.name %> !</h2>
+<p>You are a <%= user.role %></p>
+<p><%= JSON.stringify(user) %></p>
 <form action="/logout" method="POST">
-    <button type="submit">Log Out</button>
-  </form>
+  <button type="submit">Log Out</button>
+</form>
+<form action="/user/editprofile" method="POST">
+  <div>
+    <label for="name">Name</label>
+    <input type="text" id="updateField" name="name" />
+  </div>
+  <div>
+    <label>age</label>
+    <input type="number" id="updateField" name="age" />
+  </div>
+  <div>
+    <label>height</label>
+    <input type="number" id="updateField" name="height" />
+  </div>
+  <div>
+    <label>weight</label>
+    <input type="number" id="updateField" name="weight" />
+  </div>
+  <div>
+    <label>address</label>
+    <input type="text" id="updateField" name="address" />
+  </div>
+  <div>
+    <label>allergies</label>
+    <input type="text" id="updateField" name="allergies" />
+  </div>
+  <button type="submit">UpdateProfile</button>
+</form>

@@ -10,7 +10,9 @@ export async function validateUser(req, res, next) {
     if (await bcrypt.compare(req.body.password, user.password)) {
       req.session.user = user;
       req.session.isLoggedIn = true;
-      req.logout = () => {req.session.destroy()};
+      req.logout = () => {
+        req.session.destroy();
+      };
       next();
     } else {
       return res
@@ -20,4 +22,19 @@ export async function validateUser(req, res, next) {
   } catch (e) {
     return res.status(403).json({ message: e });
   }
+}
+
+export function checkAuth(req, res, next) {
+  if (req.session.isLoggedIn) {
+    return next();
+  }
+
+  res.redirect("/login");
+}
+
+export function checkNotAuth(req, res, next) {
+  if (req.session.isLoggedIn) {
+    return res.redirect("/");
+  }
+  next();
 }

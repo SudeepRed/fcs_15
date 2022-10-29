@@ -3,10 +3,12 @@ import dotenv from "dotenv";
 import { createDB } from "./db/schema.js";
 import * as db from "./db/queries.js";
 import * as bcrypt from "bcrypt";
-import * as bauth from "./controllers/basicAuth.js";
+import * as auth from "./controllers/basicAuth.js";
 import session from "express-session";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
+
+import * as user from "./apis/user.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -23,22 +25,22 @@ app.use(
     saveUninitialized: false,
   })
 );
-
+app.use("/user", user.router);
 app.get(
   "/health",
-  checkAuth,
-  roleAuth.roleCheck(role.USER_ROLE.ADMIN),
+  auth.checkAuth,
+  roleAuth.roleCheck([role.USER_ROLE.ADMIN]),
   (req, res) => {
     res.render("health.ejs");
   }
 );
-app.get("/", checkAuth, (req, res) => {
-  res.render("index.ejs");
+app.get("/", auth.checkAuth, (req, res) => {
+  res.render("index.ejs", { user: req.session.user });
 });
-app.get("/login", checkNotAuth, (req, res) => {
+app.get("/login", auth.checkNotAuth, (req, res) => {
   res.render("login.ejs");
 });
-app.post("/login", checkNotAuth, bauth.validateUser, async (req, res) => {
+app.post("/login", auth.checkNotAuth, auth.validateUser, async (req, res) => {
   return res.redirect("/");
 });
 
@@ -47,7 +49,7 @@ app.get("/register", (req, res) => {
     message: "",
   });
 });
-app.post("/register", checkNotAuth, async (req, res) => {
+app.post("/register", auth.checkNotAuth, async (req, res) => {
   try {
     if (
       req.body.role == role.USER_ROLE.PATIENT ||
@@ -78,27 +80,12 @@ app.post("/register", checkNotAuth, async (req, res) => {
   }
 });
 
-app.post("/logout", checkAuth, (req, res) => {
+app.post("/logout", auth.checkAuth, (req, res) => {
   req.session.destroy();
   res.redirect("/login");
 });
 app.listen(process.env.PORT, () => {
   console.log("Server Started");
 });
-
-function checkAuth(req, res, next) {
-  if (req.session.isLoggedIn) {
-    return next();
-  }
-
-  res.redirect("/login");
-}
-
-function checkNotAuth(req, res, next) {
-  if (req.session.isLoggedIn) {
-    return res.redirect("/");
-  }
-  next();
-}
 
 createDB();
