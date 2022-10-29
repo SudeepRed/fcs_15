@@ -1,11 +1,11 @@
 import { client } from "./db.js";
 
-export async function createUser(user, role) {
+export async function createUser(user) {
   try {
     await client.query(
       `
         INSERT INTO USERS (id, name, email, password, age, role) VALUES ($1, $2 , $3, $4, $5, $6);`,
-      [user.id, user.name, user.email, user.password, user.age, role]
+      [user.id, user.name, user.email, user.password, user.age,user.role]
     );
   } catch (e) {
     console.log(e);

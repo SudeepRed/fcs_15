@@ -9,6 +9,7 @@ import flash from "express-flash";
 import session from "express-session";
 import methodOverride from "method-override";
 import * as role from "./constants/role.js";
+import * as roleAuth from "./controllers/role.js"
 dotenv.config();
 const app = express();
 
@@ -36,7 +37,7 @@ app.use(passport.initialize());
 app.use(passport.session());
 app.use(methodOverride("_method"));
 
-app.get("/health", (req, res) => {
+app.get("/health", checkAuth, roleAuth.roleCheck(role.USER_ROLE.ADMIN), (req, res) => {
   res.render("health.ejs");
 });
 app.get("/", checkAuth, (req, res) => {
@@ -59,7 +60,6 @@ app.get("/register", (req, res) => {
 });
 app.post("/register", checkNotAuth, async (req, res) => {
   try {
-    console.log(role.USER_ROLE);
     if (
       req.body.role == role.USER_ROLE.PATIENT ||
       req.body.role == role.USER_ROLE.PROFESSIONAL
@@ -74,7 +74,7 @@ app.post("/register", checkNotAuth, async (req, res) => {
         age: req.body.age || 0,
         role: req.body.role,
       };
-      db.createUser(user, "patient");
+      db.createUser(user);
       res.redirect("/login");
     } else {
       return res.render("register.ejs", {
@@ -86,7 +86,6 @@ app.post("/register", checkNotAuth, async (req, res) => {
     return res.render("register.ejs", {
       message: "Something went wrong. Please try again.",
     });
-    
   }
 });
 
