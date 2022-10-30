@@ -1,11 +1,11 @@
 <form action="/action_page.php">
-    <label for="org">Associate yourself with an Organization</label>
-    <select name="orgs" id="orgs">
-      <option disabled selected> Select User..</option>
-       <% orgs.forEach((org) => { %>
-      <option value="<%= org.id %>" > <%=org.name %> </option>
-      <%  })  %>
-    </select>
-    <br><br>
-    <input type="submit" value="Submit">
-  </form>
+  <label for="org">Associate yourself with an Organization</label>
+  <select name="orgs" id="orgs">
+    <option disabled selected>Select User..</option>
+    <% orgs.forEach((org) => { %>
+    <option value="<%= org.id %>"><%=org.name %></option>
+    <% }) %>
+  </select>
+  <br /><br />
+  <input type="submit" value="Submit" />
+</form>

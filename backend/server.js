@@ -93,7 +93,7 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
           id: Date.now(),
           name: req.body.name,
           domain: req.body.domain,
-          role : req.body.role,
+          role: req.body.role,
           password: hashedPassword,
           location: req.body.location,
           description: req.body.description,

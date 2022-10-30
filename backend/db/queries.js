@@ -60,13 +60,21 @@ export async function getUserbyId(id) {
   }
 }
 
-
 export async function createOrg(user) {
   try {
     await client.query(
       `
         INSERT INTO Orgs VALUES ($1, $2 , $3, $4, $5, $6, $7, $8);`,
-      [user.id, user.name, user.domain, user.role, user.password, user.description, user.location, user.contactDetails]
+      [
+        user.id,
+        user.name,
+        user.domain,
+        user.role,
+        user.password,
+        user.description,
+        user.location,
+        user.contactDetails,
+      ]
     );
   } catch (e) {
     console.log(e);
