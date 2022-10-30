@@ -92,3 +92,32 @@ export async function getOrgbyDomain(domain) {
     return null;
   }
 }
+
+export async function getOrgs() {
+  try {
+    const result = await client.query(`SELECT * FROM ORGS`);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+
+export async function getUsersByRole(role) {
+  try {
+    const result = await client.query(`SELECT * FROM USERS WHERE ROLE = $1;`,[role]);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+export async function getOrgsByRole(role) {
+  try {
+    const result = await client.query(`SELECT * FROM ORGS WHERE ROLE = $1;`,[role]);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}

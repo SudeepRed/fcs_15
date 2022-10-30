@@ -1,6 +1,15 @@
 <h2>hello <%= user.name %> !</h2>
 <p>You are a <%= user.role %></p>
 <p><%= JSON.stringify(user) %></p>
+
+
+<form action="/user/getorgs" method="GET">
+  <button type="submit">Get orgs</button>
+</form>
+<form action="/user/getPROFESSIONAL" method="GET">
+  <button type="submit">Get professionals</button>
+</form>
+
 <form action="/logout" method="POST">
   <button type="submit">Log Out</button>
 </form>

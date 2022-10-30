@@ -7,7 +7,7 @@ import * as auth from "./controllers/basicAuth.js";
 import session from "express-session";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
-
+import * as helper from "./ejs_helpers/orgs.js"
 import * as user from "./apis/user.js";
 dotenv.config();
 const app = express();

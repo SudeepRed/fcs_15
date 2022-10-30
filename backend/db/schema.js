@@ -36,5 +36,20 @@ export async function createDB() {
   } catch (error) {
     console.log(error);
   }
+  try {
+    await client.query(`
+    DO $$ BEGIN
+      CREATE TYPE  USER_ROLE AS ENUM('admin', 'patient', 'professional');
+      CREATE TYPE  ORG_ROLE AS ENUM('hospital', 'pharmacy', 'insurance');
+    EXCEPTION
+      WHEN duplicate_object THEN null;
+    END $$;
+    ALTER TABLE USERS
+    ALTER COLUMN ROLE TYPE USER_ROLE USING (ROLE::USER_ROLE);
+    ALTER TABLE ORGS
+    ALTER COLUMN ROLE TYPE ORG_ROLE USING (ROLE::ORG_ROLE);`);
+  } catch (error) {
+    console.log(error);
+  }
   //END
 }
