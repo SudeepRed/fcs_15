@@ -12,8 +12,6 @@ export async function validateUser(req, res, next) {
         let updatedUser = delete user['password'];
         req.session.data = {};
         req.session.data.user = user;
-        console.log(req.session)
-
         req.session.isLoggedIn = true;
         req.logout = () => {
           req.session.destroy();

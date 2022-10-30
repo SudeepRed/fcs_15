@@ -9,6 +9,7 @@ import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
 import * as helper from "./ejs_helpers/orgs.js";
 import * as user from "./apis/user.js";
+import * as admin from "./apis/admin.js";
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -26,6 +27,7 @@ app.use(
   })
 );
 app.use("/user", user.router);
+app.use("/admin", admin.router);
 app.get(
   "/health",
   auth.checkAuth,

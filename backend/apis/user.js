@@ -3,8 +3,11 @@ import { roleCheck } from "../controllers/role.js";
 import * as roles from "../constants/role.js";
 import * as db from "../db/queries.js";
 import express from "express";
+import { statusCheck } from "../controllers/status.js";
 export const router = express.Router();
+router.use(statusCheck);
 router.use(checkAuth);
+
 router.post(
   "/editprofile",
   roleCheck([
@@ -37,6 +40,7 @@ router.get("/deletedocument", (req, res) => {
 });
 router.get(
   "/getorgs",
+
   roleCheck([roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {

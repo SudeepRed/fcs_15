@@ -51,5 +51,24 @@ export async function createDB() {
   } catch (error) {
     console.log(error);
   }
+  try {
+    await client.query(`
+    DO $$ BEGIN
+      CREATE TYPE  STATUS AS ENUM('pending', 'approved');
+    EXCEPTION
+      WHEN duplicate_object THEN null;
+    END $$;
+    ALTER TABLE USERS
+    ADD IF NOT EXISTS status STATUS DEFAULT 'pending';`);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await client.query(`
+    ALTER TABLE ORGS
+    ADD IF NOT EXISTS status STATUS DEFAULT 'pending' ;`);
+  } catch (error) {
+    console.log(error);
+  }
   //END
 }

@@ -105,7 +105,9 @@ export async function getOrgs() {
 
 export async function getUsersByRole(role) {
   try {
-    const result = await client.query(`SELECT * FROM USERS WHERE ROLE = $1;`,[role]);
+    const result = await client.query(`SELECT * FROM USERS WHERE ROLE = $1;`, [
+      role,
+    ]);
     return result.rows;
   } catch (e) {
     console.log(e);
@@ -114,8 +116,33 @@ export async function getUsersByRole(role) {
 }
 export async function getOrgsByRole(role) {
   try {
-    const result = await client.query(`SELECT * FROM ORGS WHERE ROLE = $1;`,[role]);
+    const result = await client.query(`SELECT * FROM ORGS WHERE ROLE = $1;`, [
+      role,
+    ]);
     return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+export async function getApplications() {
+  try {
+    const result = await client.query(
+      `SELECT * FROM USERS WHERE status = 'pending';`
+    );
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+export async function approveApplication(id) {
+  try {
+    const result = await client.query(
+      `UPDATE USERS SET status = 'approved' WHERE id = $1;`,
+      [id]
+    );
+    return;
   } catch (e) {
     console.log(e);
     return null;
