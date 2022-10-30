@@ -1,42 +1,63 @@
-<h2>hello <%= user.name %> !</h2>
-<p>You are a <%= user.role %></p>
-<p><%= JSON.stringify(user) %></p>
+<% if ( typeof data.user !='undefined' ){ %>
+  <h2>hello <%= data.user.name %> !</h2>
+  <p>You are a <%= data.user.role %>
+  </p>
+  <p>
+    <%= JSON.stringify(data.user) %>
+  </p>
+  <% } %>
+    <div>
+      <% if ( typeof data.orgs !='undefined' ){ %>
+        <% data.orgs.forEach(function(org) { %>
+          <p>
+            <%= org.name %>
+          </p>
+          <% }) %>
+            <% } %>
+              <form action="/user/getorgs" method="GET">
+                <button type="submit">Get orgs</button>
+              </form>
+    </div>
+    <div>
+      <% if ( typeof data.professionals !='undefined' ){ %>
+        <% data.professionals.forEach(function(professionals) { %>
+          <p>
+            <%= professionals.name %>
+          </p>
+          <% }) %>
+            <% } %>
+              <form action="/user/getprofessionals" method="GET">
+                <button type="submit">Get professionals</button>
+              </form>
+    </div>
 
-
-<form action="/user/getorgs" method="GET">
-  <button type="submit">Get orgs</button>
-</form>
-<form action="/user/getPROFESSIONAL" method="GET">
-  <button type="submit">Get professionals</button>
-</form>
-
-<form action="/logout" method="POST">
-  <button type="submit">Log Out</button>
-</form>
-<form action="/user/editprofile" method="POST">
-  <div>
-    <label for="name">Name</label>
-    <input type="text" id="updateField" name="name" />
-  </div>
-  <div>
-    <label>age</label>
-    <input type="number" id="updateField" name="age" />
-  </div>
-  <div>
-    <label>height</label>
-    <input type="number" id="updateField" name="height" />
-  </div>
-  <div>
-    <label>weight</label>
-    <input type="number" id="updateField" name="weight" />
-  </div>
-  <div>
-    <label>address</label>
-    <input type="text" id="updateField" name="address" />
-  </div>
-  <div>
-    <label>allergies</label>
-    <input type="text" id="updateField" name="allergies" />
-  </div>
-  <button type="submit">UpdateProfile</button>
-</form>
+    <form action="/logout" method="POST">
+      <button type="submit">Log Out</button>
+    </form>
+    <form action="/user/editprofile" method="POST">
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="updateField" name="name" />
+      </div>
+      <div>
+        <label>age</label>
+        <input type="number" id="updateField" name="age" />
+      </div>
+      <div>
+        <label>height</label>
+        <input type="number" id="updateField" name="height" />
+      </div>
+      <div>
+        <label>weight</label>
+        <input type="number" id="updateField" name="weight" />
+      </div>
+      <div>
+        <label>address</label>
+        <input type="text" id="updateField" name="address" />
+      </div>
+      <div>
+        <label>allergies</label>
+        <input type="text" id="updateField" name="allergies" />
+      </div>
+      <button type="submit">UpdateProfile</button>
+    </form>

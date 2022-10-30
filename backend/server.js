@@ -7,7 +7,7 @@ import * as auth from "./controllers/basicAuth.js";
 import session from "express-session";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
-import * as helper from "./ejs_helpers/orgs.js"
+import * as helper from "./ejs_helpers/orgs.js";
 import * as user from "./apis/user.js";
 dotenv.config();
 const app = express();
@@ -35,7 +35,7 @@ app.get(
   }
 );
 app.get("/", auth.checkAuth, (req, res) => {
-  res.render("index.ejs", { user: req.session.user });
+  res.render("index.ejs", { data: req.session.data });
 });
 app.get("/login", auth.checkNotAuth, (req, res) => {
   res.render("login.ejs");

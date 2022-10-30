@@ -35,22 +35,32 @@ router.get("/getdocuments", (req, res) => {
 router.get("/deletedocument", (req, res) => {
   res.send("edit");
 });
-router.get("/getorgs", roleCheck([roles.USER_ROLE.PATIENT]),async (req, res) => {
-  try {
-    const result = await db.getOrgs();
-    return res.send({ orgs: result });
-  } catch (err) {
-    console.log(err);
+router.get(
+  "/getorgs",
+  roleCheck([roles.USER_ROLE.PATIENT]),
+  async (req, res) => {
+    try {
+      const result = await db.getOrgs();
+      req.session.data.orgs = result;
+      return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
-router.get("/getPROFESSIONAL", roleCheck([roles.USER_ROLE.PATIENT]),async (req, res) => {
-  try {
-    const result = await db.getUsersByRole(roles.USER_ROLE.PROFESSIONAL);
-    return res.send({ PROFESSIONAL: result });
-  } catch (err) {
-    console.log(err);
+);
+router.get(
+  "/getprofessionals",
+  roleCheck([roles.USER_ROLE.PATIENT]),
+  async (req, res) => {
+    try {
+      const result = await db.getUsersByRole(roles.USER_ROLE.PROFESSIONAL);
+      req.session.data.professionals = result;
+      return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+    }
   }
-});
+);
 router.get("/getmedicines", (req, res) => {
   res.send("edit");
 });

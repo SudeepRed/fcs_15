@@ -1,6 +1,6 @@
 export function roleCheck(roles) {
   return (req, res, next) => {
-    if (roles.includes(req.session.user.role)) {
+    if (roles.includes(req.session.data.user.role)) {
       next();
     } else {
       res.status(401);

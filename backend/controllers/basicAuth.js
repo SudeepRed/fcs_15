@@ -9,7 +9,11 @@ export async function validateUser(req, res, next) {
   if (user != undefined) {
     try {
       if (await bcrypt.compare(req.body.password, user.password)) {
-        req.session.user = user;
+        let updatedUser = delete user['password'];
+        req.session.data = {};
+        req.session.data.user = user;
+        console.log(req.session)
+
         req.session.isLoggedIn = true;
         req.logout = () => {
           req.session.destroy();
