@@ -45,6 +45,7 @@ export async function getUserbyEmail(email) {
     return result.rows[0];
   } catch (e) {
     console.log(e);
+    return null;
   }
 }
 export async function getUserbyId(id) {
@@ -55,5 +56,31 @@ export async function getUserbyId(id) {
     return result.rows[0];
   } catch (e) {
     console.log(e);
+    return null;
+  }
+}
+
+
+export async function createOrg(user) {
+  try {
+    await client.query(
+      `
+        INSERT INTO Orgs VALUES ($1, $2 , $3, $4, $5, $6, $7, $8);`,
+      [user.id, user.name, user.domain, user.role, user.password, user.description, user.location, user.contactDetails]
+    );
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+export async function getOrgbyDomain(domain) {
+  try {
+    const result = await client.query(`SELECT * FROM ORGS WHERE domain = $1;`, [
+      domain,
+    ]);
+    return result.rows[0];
+  } catch (e) {
+    console.log(e);
+    return null;
   }
 }

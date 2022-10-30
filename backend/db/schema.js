@@ -21,4 +21,20 @@ export async function createDB() {
   } catch (error) {
     console.log(error);
   }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS orgs(
+      id bigint PRIMARY KEY,
+      name varchar(100) NOT NULL,
+      domain varchar(100) UNIQUE NOT NULL,
+      role varchar(100) NOT NULL,
+      password varchar(100) UNIQUE NOT NULL,
+      description text DEFAULT '',
+      location text DEFAULT '',
+      contactDetails text DEFAULT ''
+    );`);
+  } catch (error) {
+    console.log(error);
+  }
+  //END
 }

@@ -49,7 +49,7 @@ app.get("/register", (req, res) => {
     message: "",
   });
 });
-app.post("/register", auth.checkNotAuth, async (req, res) => {
+app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
   try {
     if (
       req.body.role == role.USER_ROLE.PATIENT ||
@@ -71,6 +71,41 @@ app.post("/register", auth.checkNotAuth, async (req, res) => {
       return res.render("register.ejs", {
         message: "Role can only be patient or professional",
       });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.render("register.ejs", {
+      message: "Something went wrong. Please try again.",
+    });
+  }
+});
+app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
+  try {
+    {
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.password, salt);
+      if (
+        req.body.role == role.ORG_ROLE.HOSPITAL ||
+        req.body.role == role.ORG_ROLE.PHARMACY ||
+        req.body.role == role.ORG_ROLE.INSURANCE
+      ) {
+        const org = {
+          id: Date.now(),
+          name: req.body.name,
+          domain: req.body.domain,
+          role : req.body.role,
+          password: hashedPassword,
+          location: req.body.location,
+          description: req.body.description,
+          contactDetails: req.body.contactDetails,
+        };
+        db.createOrg(org);
+        res.redirect("/login");
+      } else {
+        return res.render("register.ejs", {
+          message: "Wrong ROLE!",
+        });
+      }
     }
   } catch (error) {
     console.log(error);
