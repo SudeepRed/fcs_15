@@ -8,22 +8,18 @@ router.use(checkAuth);
 router.use(roleCheck([roles.USER_ROLE.ADMIN]));
 router.get("/getapplications", async (req, res) => {
   try {
-    const result = await db.getApplications();
+    const result = await db.getApplications(req.query.type);
     req.session.data.applications = result;
-
-    
     return res.redirect("/");
   } catch (err) {
     console.log(err);
   }
 });
 router.post("/approve", async (req, res) => {
-    console.log(req.body.id);
-    try {
-
-      const result = await db.approveApplication(req.body.id);      
-      return res.redirect("/");
-    } catch (err) {
-      console.log(err);
-    }
-  });
+  try {
+    const result = await db.approveApplication(req.body.id, req.body.type);
+    return res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+});

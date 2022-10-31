@@ -1,64 +1,74 @@
 <h1>User Register</h1>
 <%= message %>
-<form action="/registeruser" method="POST">
-  <div>
-    <label for="name">Name</label>
-    <input type="text" id="name" name="name" required />
-  </div>
-  <div>
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" required />
-  </div>
-  <div>
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password" required />
-  </div>
-  <div>
-    <label for="role">Role</label>
-    <select name="role" id="role" required>
-      <option value="patient">Patient</option>
-      <option value="professional">Professional</option>
-    </select>
-  </div>
-  <button type="submit">Register</button>
-</form>
+  <form action="/registeruser" method="POST">
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+    <div>
+      <label for="email">Email</label>
+      <input type="email" id="email" name="email" required />
+    </div>
+    <div>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <div>
+      <label for="role">Role</label>
+      <select name="role" id="role" required>
+        <option value="patient">Patient</option>
+        <option value="professional">Professional</option>
+      </select>
+    </div>
+    <div>
+      <label for="otp">Enter OTP</label>
+      <input type="text" id="otp" name="otp" />
+    </div>
+    <button type="submit" name="getOtp">Get otp</button>
+    <button type="submit" name="register">Register</button>
+  </form>
 
-<h1>Organization Register</h1>
+  <h1>Organization Register</h1>
 
-<form action="/registerorg" method="POST">
-  <div>
-    <label for="name">Org Name</label>
-    <input type="text" id="name" name="name" required />
-  </div>
-  <div>
-    <label for="role">Type of Org</label>
-    <select name="role" id="role" required>
-      <option value="hospital">hospital</option>
-      <option value="pharmacy">pharmacy</option>
-      <option value="insurance">insurance</option>
-    </select>
-  </div>
-  <div>
-    <label for="name">Domain (should be unique!)</label>
-    <input type="text" id="domain" name="domain" required />
-  </div>
-  <div>
-    <label for="name">Secret Key </label>
-    <input type="password" id="password" name="password" required />
-  </div>
-  <div>
-    <label for="description">Description</label>
-    <input type="text" id="description" name="description" required />
-  </div>
-  <div>
-    <label for="location">Location</label>
-    <input type="text" id="location" name="location" required />
-  </div>
-  <div>
-    <label for="contactDetails">Contact details</label>
-    <input type="string" id="contactDetails" name="contactDetails" required />
-  </div>
-  <button type="submit">Register Org</button>
-</form>
+  <form action="/registerorg" method="POST">
+    <div>
+      <label for="name">Org Name</label>
+      <input type="text" id="name" name="name" required />
+    </div>
+    <div>
+      <label for="role">Type of Org</label>
+      <select name="role" id="role" required>
+        <option value="hospital">hospital</option>
+        <option value="pharmacy">pharmacy</option>
+        <option value="insurance">insurance</option>
+      </select>
+    </div>
+    <div>
+      <label for="name">Work email (should be unique!)</label>
+      <input type="text" id="domain" name="domain" required />
+    </div>
+    <div>
+      <label for="name">Secret Key </label>
+      <input type="password" id="password" name="password" required />
+    </div>
+    <div>
+      <label for="description">Description</label>
+      <input type="text" id="description" name="description" required />
+    </div>
+    <div>
+      <label for="location">Location</label>
+      <input type="text" id="location" name="location" required />
+    </div>
+    <div>
+      <label for="contactDetails">Contact details</label>
+      <input type="string" id="contactDetails" name="contactDetails" required />
+    </div>
+    <div>
+      <label for="otp">Enter OTP</label>
+      <input type="text" id="otp" name="otp" />
+    </div>
+    <button type="submit" name="getOtp">Get otp</button>
+    <button type="submit" name="register">Register</button>
+  </form>
 
-<h1><a href="/login">Login</a></h1>
+  <h1><a href="/login">Login</a></h1>

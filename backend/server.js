@@ -7,7 +7,7 @@ import * as auth from "./controllers/basicAuth.js";
 import session from "express-session";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
-import * as helper from "./ejs_helpers/orgs.js";
+import * as otp from "./controllers/otpAuth.js";
 import * as user from "./apis/user.js";
 import * as admin from "./apis/admin.js";
 dotenv.config();
@@ -52,68 +52,93 @@ app.get("/register", (req, res) => {
   });
 });
 app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
-  try {
-    if (
-      req.body.role == role.USER_ROLE.PATIENT ||
-      req.body.role == role.USER_ROLE.PROFESSIONAL
-    ) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
-      const user = {
-        id: Date.now(),
-        name: req.body.name,
-        email: req.body.email,
-        password: hashedPassword,
-        age: req.body.age || 0,
-        role: req.body.role,
-      };
-      db.createUser(user);
-      res.redirect("/login");
-    } else {
-      return res.render("register.ejs", {
-        message: "Role can only be patient or professional",
-      });
-    }
-  } catch (error) {
-    console.log(error);
-    return res.render("register.ejs", {
-      message: "Something went wrong. Please try again.",
-    });
+  if (req.body.getOtp != undefined && req.body.register == undefined) {
+    otp.sendMail(req.body.email);
+    return;
   }
-});
-app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
-  try {
-    {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.password, salt);
-      if (
-        req.body.role == role.ORG_ROLE.HOSPITAL ||
-        req.body.role == role.ORG_ROLE.PHARMACY ||
-        req.body.role == role.ORG_ROLE.INSURANCE
-      ) {
-        const org = {
-          id: Date.now(),
-          name: req.body.name,
-          domain: req.body.domain,
-          role: req.body.role,
-          password: hashedPassword,
-          location: req.body.location,
-          description: req.body.description,
-          contactDetails: req.body.contactDetails,
-        };
-        db.createOrg(org);
-        res.redirect("/login");
-      } else {
+  if (req.body.register != undefined && req.body.getOtp == undefined) {
+    if (otp.verifyOtp(req.body.otp)) {
+      try {
+        if (
+          req.body.role == role.USER_ROLE.PATIENT ||
+          req.body.role == role.USER_ROLE.PROFESSIONAL
+        ) {
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(req.body.password, salt);
+          const user = {
+            id: Date.now(),
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword,
+            age: req.body.age || 0,
+            role: req.body.role,
+          };
+          db.createUser(user);
+          res.redirect("/login");
+        } else {
+          return res.render("register.ejs", {
+            message: "Role can only be patient or professional",
+          });
+        }
+      } catch (error) {
+        console.log(error);
         return res.render("register.ejs", {
-          message: "Wrong ROLE!",
+          message: "Something went wrong. Please try again.",
         });
       }
+    } else {
+      return res.render("register.ejs", {
+        message: "Please enter the correct otp",
+      });
     }
-  } catch (error) {
-    console.log(error);
-    return res.render("register.ejs", {
-      message: "Something went wrong. Please try again.",
-    });
+  }
+});
+
+app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
+  if (req.body.getOtp != undefined && req.body.register == undefined) {
+    otp.sendMail(req.body.domain);
+    return;
+  }
+  if (req.body.register != undefined && req.body.getOtp == undefined) {
+    if (otp.verifyOtp(req.body.otp)) {
+      try {
+        {
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(req.body.password, salt);
+          if (
+            req.body.role == role.ORG_ROLE.HOSPITAL ||
+            req.body.role == role.ORG_ROLE.PHARMACY ||
+            req.body.role == role.ORG_ROLE.INSURANCE
+          ) {
+            const org = {
+              id: Date.now(),
+              name: req.body.name,
+              domain: req.body.domain,
+              role: req.body.role,
+              password: hashedPassword,
+              location: req.body.location,
+              description: req.body.description,
+              contactDetails: req.body.contactDetails,
+            };
+            db.createOrg(org);
+            res.redirect("/login");
+          } else {
+            return res.render("register.ejs", {
+              message: "Wrong ROLE!",
+            });
+          }
+        }
+      } catch (error) {
+        console.log(error);
+        return res.render("register.ejs", {
+          message: "Something went wrong. Please try again.",
+        });
+      }
+    } else {
+      return res.render("register.ejs", {
+        message: "Please enter the correct otp",
+      });
+    }
   }
 });
 

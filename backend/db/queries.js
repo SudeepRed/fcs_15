@@ -125,26 +125,51 @@ export async function getOrgsByRole(role) {
     return null;
   }
 }
-export async function getApplications() {
-  try {
-    const result = await client.query(
-      `SELECT * FROM USERS WHERE status = 'pending';`
-    );
-    return result.rows;
-  } catch (e) {
-    console.log(e);
-    return null;
+export async function getApplications(type) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `SELECT * FROM USERS WHERE status = 'pending';`
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  } else if (type == "org") {
+    try {
+      const result = await client.query(
+        `SELECT * FROM ORGS WHERE status = 'pending';`
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 }
-export async function approveApplication(id) {
-  try {
-    const result = await client.query(
-      `UPDATE USERS SET status = 'approved' WHERE id = $1;`,
-      [id]
-    );
-    return;
-  } catch (e) {
-    console.log(e);
-    return null;
+export async function approveApplication(id, type) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `UPDATE USERS SET status = 'approved' WHERE id = $1;`,
+        [id]
+      );
+      return;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  } else if (type == "org") {
+    try {
+      const result = await client.query(
+        `UPDATE ORGS SET status = 'approved' WHERE id = $1;`,
+        [id]
+      );
+      return;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
   }
 }

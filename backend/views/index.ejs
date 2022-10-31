@@ -69,8 +69,21 @@
   <% if ( typeof data.user !='undefined' ){ %>
     <% if(data.user.role=='admin' ) {%>
       <form action="/admin/getapplications" method="GET">
+        <button type="submit" name = "type" value = "user">
+          <h2>See all Pending User Applications</h2>
+        </button>
+        <button type="submit" name = "type" value = "org">
+          <h2>See all Pending Org Applications</h2>
+        </button>
+      </form>
+      <% }} %>
+</div>
+<div>
+  <% if ( typeof data.user !='undefined' ){ %>
+    <% if(data.user.role=='admin' ) {%>
+      <form action="/admin/getapplications" method="GET">
         <button type="submit">
-          <h2>See all Pending Applications</h2>
+          <h2>See all Pending Org Applications</h2>
         </button>
       </form>
       <% }} %>
@@ -90,13 +103,23 @@
 
 </div>
 <div>
-  <form action="/admin/approve" method="POST">
-    <div>
-      <label for="id">Enter application ID</label>
-      <input type="number" id="updateField" name="id" />
-    </div>
-    <button type="submit">
-      <h3>Approve</h3>
-    </button>
-  </form>
+  <% if ( typeof data.user !='undefined' ){ %>
+    <% if(data.user.role=='admin' ) {%>
+      <form action="/admin/approve" method="POST">
+        <div>
+          <label for="id">Enter application ID</label>
+          <input type="number" id="updateField" name="id" />
+        </div>
+        <div>
+          <label for="type">Select Type</label>
+          <select name="type" id="type" required>
+            <option value="org">Organization</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+        <button type="submit">
+          <h3>Approve</h3>
+        </button>
+      </form>
+      <% }} %>
 </div>

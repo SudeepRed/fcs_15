@@ -16,14 +16,15 @@ router.post(
     roles.USER_ROLE.PROFESSIONAL,
   ]),
   async (req, res) => {
-    let user = req.session.user;
+    let user = req.session.data.user;
     const data = req.body;
     user.name = data.name != "" ? data.name : user.name;
-    user.age = data.age != "" ? data.age : user.age;
-    user.height = data.height != "" ? data.height : user.height;
-    user.weight = data.weight != "" ? data.weight : user.weight;
-    user.address = data.address != "" ? data.address : user.address;
-    user.allergies = data.allergies != "" ? data.allergies : user.allergies;
+    user.age = data.age != "" ? data.age : user.age || 0;
+    user.height = data.height != "" ? data.height : user.height || 0;
+    user.weight = data.weight != "" ? data.weight : user.weight || 0;
+    user.address = data.address != "" ? data.address : user.address || "";
+    user.allergies =
+      data.allergies != "" ? data.allergies : user.allergies || "";
     try {
       const result = await db.updateUser(user);
       return res.redirect("/");
