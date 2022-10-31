@@ -10,6 +10,19 @@ import * as roleAuth from "./controllers/role.js";
 import * as otp from "./controllers/otpAuth.js";
 import * as user from "./apis/user.js";
 import * as admin from "./apis/admin.js";
+import { v4 as uuid } from "uuid";
+import multer from "multer";
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+      cb(null, './db/uploads')
+  },
+  filename: (req, file, cb) => {
+      
+      // or 
+      // uuid, or fieldname
+      cb(null, uuid());
+  }
+})
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -18,6 +31,7 @@ app.use(
     extended: true,
   })
 );
+app.use(express.static('db'))
 app.set("view-engine", "ejs");
 app.use(
   session({
@@ -140,6 +154,10 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
       });
     }
   }
+});
+const upload = multer({ storage });
+app.post("/upload", auth.checkAuth, upload.single('upload'),(req, res) => {
+  res.download("./db/uploads/midoriya-allmight-hug.jpg");
 });
 
 app.post("/logout", auth.checkAuth, (req, res) => {
