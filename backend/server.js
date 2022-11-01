@@ -14,7 +14,7 @@ import { v4 as uuid } from "uuid";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import * as fileHelper from "./controllers/file.js";
+import zip from "express-zip";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -184,7 +184,6 @@ app.post("/passphrase", auth.checkAuth, async (req, res) => {
   }
   if (req.body.otp != undefined && req.body.pass != undefined) {
     if (otp.verifyOtp(req.body.otp)) {
-      console.log(req.body);
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(req.body.pass, salt);
       try {
@@ -204,26 +203,111 @@ app.post("/passphrase", auth.checkAuth, async (req, res) => {
     res.send("enter otp/passphrase");
   }
 });
+app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
+  try {
+    const type = req.session.data.user.type;
+    const myFiles = await db.getMyfiles(type, req.session.data.user.id);
+    console.log(myFiles);
 
+    res.json(myFiles);
+  } catch (error) {
+    console.log(error);
+    res.send("failed to get myfiles");
+  }
+});
+app.post("/download", auth.checkAuth, async (req, res) => {
+  try {
+    const type = req.session.data.user.type;
+    const myFiles = await db.getMyfiles(type, req.session.data.user.id);
+    console.log(myFiles);
+    let files = [];
+    const dir = "./db/uploads/";
+    myFiles.forEach((file) => {
+      files.push({
+        path: dir + file.filename,
+        name: file.filename,
+      });
+    });
+    res.zip(files);
+    res.write(JSON.stringify(myFiles));
+    res.end();
+  } catch (error) {
+    console.log(error);
+    res.send("failed to get myfiles");
+  }
+});
+app.post(
+  "/deletefile",
+  auth.checkAuth,
+
+  async (req, res) => {
+    try {
+      const type = req.session.data.user.type;
+      const result = await db.deleteMyFile(type, req.body.name);
+      if (result.status == "done") {
+        const dir = "./db/uploads/" + req.body.name;
+        fs.unlinkSync(dir);
+      }
+      res.send("deleted");
+    } catch (e) {
+      console.log("e");
+    }
+  }
+);
 app.post(
   "/upload",
   auth.checkAuth,
   upload.single("upload"),
   async (req, res) => {
-    console.log(req.fileError);
     if (req.fileError) {
       return res.send("WRONG PASSPHRASE!");
     }
-
     try {
-      const result = await db.insertFile(
+      let result = await db.insertFile(
         req.session.data.user.type,
         req.session.data.user.id,
         req.file.filename
       );
+
+      if (req.body.rid) {
+        const Stype = req.session.data.user.type;
+        const Rtype = req.body.type;
+        const sid = req.session.data.user.id;
+        result = await db.shareFile(
+          Stype,
+          Rtype,
+          sid,
+          req.body.rid,
+          req.file.filename
+        );
+      }
       return res.json({ status: "success" });
     } catch (err) {
       return res.json({ error: err });
+    }
+  }
+);
+
+app.get(
+  "/getFiles",
+  auth.checkAuth,
+  roleAuth.roleCheck([role.USER_ROLE.PROFESSIONAL]),
+  async (req, res) => {
+    try {
+      const rid = req.session.data.user.id;
+      const sharedFiles = await db.getFiles(rid);
+
+      let files = [];
+      const dir = "./db/uploads/";
+      sharedFiles.forEach((file) => {
+        files.push({
+          path: dir + file.filename,
+          name: file.filename,
+        });
+      });
+      return res.zip(files);
+    } catch (e) {
+      console.log(e);
     }
   }
 );

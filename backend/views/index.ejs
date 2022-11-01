@@ -24,8 +24,9 @@
   <% if ( typeof data.professionals !='undefined' ){ %>
     <% data.professionals.forEach(function(professionals) { %>
       <p>
-        <%= professionals.name %>
-          <%= professionals.role %>
+        <%= professionals.id %>
+          <%= professionals.name %>
+            <%= professionals.role %>
       </p>
       <% }) %>
         <% } %>
@@ -134,7 +135,7 @@
   </div>
   <button type="submit" name="getOtp">Get otp</button>
   <button type="submit">
-    <h3>Add passphrase</h3>
+    Add passphrase
   </button>
 </form>
 
@@ -147,8 +148,38 @@
     <label for="id">Choose File</label>
     <input type="file" id="updateField" name="upload" required />
   </div>
+  <div>
+    <label for="id">Enter id to share file</label>
+    <input type="text" id="updateField" name="rid" required />
+  </div>
+  <div>
+    <label for="type">Select Type</label>
+    <select name="type" id="type" required>
+      <option value="org">Organization</option>
+      <option value="user">User</option>
+    </select>
+  </div>
 
   <button type="submit">
-    <h3>Upload</h3>
+    Upload & Share
   </button>
 </form>
+<form action="/getFiles" method="GET">
+  <button type="submit">Download shared applications (only for professionals)</button>
+</form>
+<div>
+  <form action="/getMyFiles" method="GET">
+    <button type="submit">Get My Files</button>
+  </form>
+
+  <form action="/download" method="POST">
+    <button type="submit">Download My Files</button>
+  </form>
+  <form action="/deletefile" method="POST">
+    <div>
+      <label for="id">Enter file name to be deleted</label>
+      <input type="text" id="updateField" name="name" required />
+    </div>
+    <button type="submit">Delete My Files</button>
+  </form>
+</div>

@@ -27,7 +27,6 @@ export async function validateUser(req, res, next) {
   }
 }
 export function checkAuth(req, res, next) {
-  // console.log(req.body, next)
   if (req.session.isLoggedIn) {
     return next();
   }

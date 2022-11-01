@@ -215,7 +215,7 @@ export async function updatePassphrase(pass, type, id) {
   if (type == "org") {
     try {
       const result = await client.query(
-        `UPDATE USERS SET PASS = $1 WHERE id = $2;`,
+        `UPDATE ORGS SET PASS = $1 WHERE id = $2;`,
         [pass, id]
       );
       return result.rows;
@@ -241,7 +241,7 @@ export async function getPassphrase(type, id) {
   if (type == "org") {
     try {
       const result = await client.query(
-        `SELECT PASS FROM USERS WHERE id = $1;`,
+        `SELECT PASS FROM ORGS WHERE id = $1;`,
         [id]
       );
       return result.rows[0];
@@ -250,4 +250,60 @@ export async function getPassphrase(type, id) {
       return null;
     }
   }
+}
+export async function shareFile(Stype, Rtype, sid, rid, filename) {
+  if (Stype == "user" && Rtype == "user") {
+    try {
+      const result = await client.query(
+        `INSERT INTO USER_SHARE_USER VALUES ($1,$2,$3) 
+        ON CONFLICT (sid,rid,filename)
+        DO 
+          UPDATE SET sid = $1, rid = $2, filename = $3;`,
+        [sid, rid, filename]
+      );
+      return result;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+}
+export async function getFiles(rid) {
+  try {
+    const result = await client.query(
+      `SELECT sid, filename FROM user_share_user where rid = $1`,
+      [rid]
+    );
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
+export async function getMyfiles(type, id) {
+  if (type == "user")
+    try {
+      const result = await client.query(
+        `SELECT filename FROM user_files where id = $1`,
+        [id]
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+}
+export async function deleteMyFile(type, name) {
+  if (type == "user")
+    try {
+      const result = await client.query(
+        `DELETE FROM USER_FILES WHERE filename = $1;`,
+        [name]
+      );
+
+      return { status: "done" };
+    } catch (e) {
+      console.log(e);
+      return { status: "failed" };
+    }
 }

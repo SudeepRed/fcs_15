@@ -32,7 +32,8 @@ export async function createDB() {
       password varchar(100) UNIQUE NOT NULL,
       description text DEFAULT '',
       location text DEFAULT '',
-      contactDetails text DEFAULT ''
+      contactDetails text DEFAULT '',
+      pass varchar(100)
     );`);
   } catch (error) {
     console.log(error);
@@ -91,6 +92,25 @@ export async function createDB() {
         REFERENCES orgs(id)
         ON DELETE CASCADE
     );
+    `);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS user_share_user(
+      sid bigint not null,
+      rid bigint not null,
+      filename varchar(50) not null,
+      PRIMARY KEY(sid, rid, filename),
+      CONSTRAINT fk_sid_user
+          FOREIGN KEY(sid) 
+        REFERENCES users(id),
+      CONSTRAINT fk_rid_user
+          FOREIGN KEY(rid) 
+        REFERENCES users(id)
+      
+    )
     `);
   } catch (error) {
     console.log(error);
