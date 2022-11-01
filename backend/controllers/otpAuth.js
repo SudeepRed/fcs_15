@@ -25,7 +25,7 @@ export async function sendMail(email) {
     let info = await transporter.sendMail({
       from: MAIL_SETTINGS.auth.email,
       to: email,
-      subject: "Hello ✔",
+      subject: "OTP From Bhamlo",
       html: `
         <div
           class="container"
