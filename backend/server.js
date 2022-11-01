@@ -207,7 +207,6 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
   try {
     const type = req.session.data.user.type;
     const myFiles = await db.getMyfiles(type, req.session.data.user.id);
-    console.log(myFiles);
 
     res.json(myFiles);
   } catch (error) {
@@ -219,7 +218,6 @@ app.post("/download", auth.checkAuth, async (req, res) => {
   try {
     const type = req.session.data.user.type;
     const myFiles = await db.getMyfiles(type, req.session.data.user.id);
-    console.log(myFiles);
     let files = [];
     const dir = "./db/uploads/";
     myFiles.forEach((file) => {

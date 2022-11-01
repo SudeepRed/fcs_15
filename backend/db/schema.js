@@ -14,7 +14,8 @@ export async function createDB() {
       weight int DEFAULT 0,
       address text DEFAULT '',
       allergies text DEFAULT '',
-      pass varchar(100)
+      pass varchar(100),
+      wallet int DEFAULT 100
        
     );
 
@@ -111,6 +112,42 @@ export async function createDB() {
         REFERENCES users(id)
       
     )
+    `);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS drugs (
+      id BIGINT PRIMARY KEY NOT NULL, 
+      name text NOT NULL, 
+      price int NOT NULL,
+      vid bigint NOT NULL
+    );
+    `);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS CLAIMS (
+      bid BIGINT NOT NULL,
+      mid int NOT NULL, 
+      time BIGINT PRIMARY KEY NOT NULL, 
+      vid BIGINT NOT NULL,
+      amount int not null,
+      status status NOT NULL DEFAULT 'pending',
+      CONSTRAINT fk_bid_claim
+              FOREIGN KEY(bid) 
+            REFERENCES users(id),
+          CONSTRAINT fk_mid_claim
+              FOREIGN KEY(mid) 
+            REFERENCES drugs(id),
+      CONSTRAINT fk_vid_claim
+              FOREIGN KEY(vid) 
+            REFERENCES orgs(id)
+      
+    );
     `);
   } catch (error) {
     console.log(error);

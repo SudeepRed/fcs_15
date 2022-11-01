@@ -33,12 +33,7 @@ router.post(
     }
   }
 );
-router.get("/getdocuments", (req, res) => {
-  res.send("edit");
-});
-router.get("/deletedocument", (req, res) => {
-  res.send("edit");
-});
+
 router.get(
   "/getorgs",
 
@@ -66,6 +61,57 @@ router.get(
     }
   }
 );
-router.get("/getmedicines", (req, res) => {
-  res.send("edit");
-});
+
+router.get(
+  "/showdrugs",
+  roleCheck([roles.USER_ROLE.PATIENT]),
+  async (req, res) => {
+    try {
+      const result = await db.getDrugs();
+      req.session.data.drugs = result;
+      return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+router.post(
+  "/buydrug",
+  roleCheck([roles.USER_ROLE.PATIENT]),
+  async (req, res) => {
+    try {
+      const data = await db.buyDrug(req.body.id, req.session.data.user.id, req.session.data.user.wallet);
+      return res.send(data)
+      // return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+router.get(
+  "/showclaims",
+  roleCheck([roles.ORG_ROLE.INSURANCE]),
+  async (req, res) => {
+    try {
+      const data = await db.showClaims(req.session.data.user.id);
+      req.session.data.claims = data;
+      return res.send(data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+router.post(
+  "/refund",
+  roleCheck([roles.ORG_ROLE.INSURANCE]),
+  async (req, res) => {
+    try {
+      const data = await db.refundAmount(req.body.id);
+      return res.send("done")
+    } catch (err) {
+      console.log(err);
+    }
+  }
+);
+
+

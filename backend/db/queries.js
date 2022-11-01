@@ -342,10 +342,7 @@ export async function deleteEntity(type, id) {
   }
   if (type == "org") {
     try {
-      const result = await client.query(
-        `DELETE FROM ORGS WHERE id= $1;`,
-        [id]
-      );
+      const result = await client.query(`DELETE FROM ORGS WHERE id= $1;`, [id]);
       return result;
     } catch (e) {
       console.log(e);
@@ -353,3 +350,67 @@ export async function deleteEntity(type, id) {
     }
   }
 }
+export async function getDrugs() {
+  try {
+    const result = await client.query(`SELECT * FROM DRUGS;`);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function buyDrug(did, uid, wallet) {
+  try {
+    let data = await client.query(`SELECT * FROM DRUGS WHERE id = $1;`, [did]);
+    let cost = data.rows[0].price;
+    const updatedWallet = wallet - cost;
+
+    if (updatedWallet < 0) return { status: "Low balance" };
+    const walletData = await client.query(
+      `UPDATE USERS SET WALLET = $1 WHERE id = $2`,
+      [updatedWallet, uid]
+    );
+
+    const date = Date.now();
+    const vid = data.rows[0].vid;
+    const claim = await client.query(
+      `INSERT INTO CLAIMS ( bid, mid, time, vid, amount ) VALUES ($1, $2, $3, $4, $5);`[
+        (uid, did, date, vid, cost)
+      ]
+    );
+    return { status: "Successful" };
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function showClaims(vid) {
+  try {
+    const data = await client.query(`SELECT * FROM CLAIMS WHERE vid = $1 and status = 'pending';`, [
+      vid,
+    ]);
+
+    return data.rows;
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function refundAmount(time) {
+  try {
+    const data = await client.query(`SELECT * FROM CLAIMS WHERE time = $1;`, [
+      time,
+    ]);
+
+    const cost = data.rows[0].amount;
+
+    const wallet = await client.query(`SELECT * FROM USERS WHERE id = $1;`, [ data.rows[0].bid]);
+
+    const updatedWallet = wallet.rows[0].wallet+cost;
+
+    const updateUser = await client.query(`UPDATE USERS SET WALLET = $1 WHERE id = $2;`, [ updatedWallet, data.rows[0].bid]);
+    const updatedClaim = await client.query(`UPDATE CLAIMS SET status = 'approved' WHERE time = $1;`, [time]);
+
+    return data.rows;
+  } catch (e) {
+    console.log(e);
+  }
+}
+

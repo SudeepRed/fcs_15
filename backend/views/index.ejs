@@ -212,3 +212,49 @@
     <button type="submit">Delete My Files</button>
   </form>
 </div>
+<div>
+  <% if ( typeof data.drugs !='undefined' ){ %>
+    <% data.drugs.forEach(function(drug) { %>
+      <p>
+        <%= drug.id %>
+          <%= drug.name %>
+            <%= drug.price %>
+      </p>
+      <% }) %>
+        <% } %>
+          <form action="/user/showdrugs" method="GET">
+            <button type="submit">SHOW DRUGS</button>
+          </form>
+          <form action="/user/buydrug" method="POST">
+            <div>
+              <label for="drug">ENTER DRUG ID TO PRUCHASE</label>
+              <input type="number" id="updateField" name="id" required />
+            </div>
+            <button type="submit">BUY DRUG</button>
+          </form>
+</div>
+<% if ( typeof data.user !='undefined' ){ %>
+  <% if(data.user.role=='insurance' ) {%>
+    <form action="/user/showclaims" method="GET">
+      
+      <button type="submit">
+        Show all PENDING Claims raised
+      </button>
+    </form>
+    <form action="/user/refund" method="POST">
+      <div>
+        <label for="id">Enter Claim ID</label>
+        <input type="number" id="updateField" name="id" />
+      </div>
+     
+      <button type="submit">
+        <h3>Refund Claim</h3>
+      </button>
+    </form>
+    <% }} %>
+
+<form action="/logout" method="POST">
+  <button type="submit">
+    <h1>Log Out</h1>
+  </button>
+</form>
