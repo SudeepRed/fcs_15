@@ -12,17 +12,35 @@ import * as user from "./apis/user.js";
 import * as admin from "./apis/admin.js";
 import { v4 as uuid } from "uuid";
 import multer from "multer";
+import path from "path";
+import fs from "fs";
+import * as fileHelper from "./controllers/file.js";
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-      cb(null, './db/uploads')
+    cb(null, "./db/uploads");
   },
   filename: (req, file, cb) => {
-      
-      // or 
-      // uuid, or fieldname
-      cb(null, uuid());
-  }
-})
+    const ext = path.extname(file.originalname);
+    const filename = uuid() + ext;
+
+    // or
+    // uuid, or fieldname
+    cb(null, filename);
+  },
+});
+const upload = multer({
+  storage: storage,
+  fileFilter: async function (req, file, cb) {
+    const ret = await auth.verifyFile(req);
+    if (ret == true) {
+      req.fileError = false;
+    } else {
+      req.fileError = true;
+    }
+    cb(null, ret);
+  },
+});
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -31,7 +49,7 @@ app.use(
     extended: true,
   })
 );
-app.use(express.static('db'))
+app.use(express.static("db"));
 app.set("view-engine", "ejs");
 app.use(
   session({
@@ -155,10 +173,60 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
     }
   }
 });
-const upload = multer({ storage });
-app.post("/upload", auth.checkAuth, upload.single('upload'),(req, res) => {
-  res.download("./db/uploads/midoriya-allmight-hug.jpg");
+app.post("/passphrase", auth.checkAuth, async (req, res) => {
+  if (req.body.getOtp != undefined) {
+    const email =
+      req.session.data.user.email != undefined
+        ? req.session.data.user.email
+        : req.session.data.user.domain;
+    otp.sendMail(email);
+    return;
+  }
+  if (req.body.otp != undefined && req.body.pass != undefined) {
+    if (otp.verifyOtp(req.body.otp)) {
+      console.log(req.body);
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(req.body.pass, salt);
+      try {
+        const result = await db.updatePassphrase(
+          hashedPassword,
+          req.session.data.user.type,
+          req.session.data.user.id
+        );
+        res.send("Successfully updated passphrase");
+      } catch (error) {
+        console.log(error);
+      }
+    } else {
+      res.send("Enter correct otp");
+    }
+  } else {
+    res.send("enter otp/passphrase");
+  }
 });
+
+app.post(
+  "/upload",
+  auth.checkAuth,
+  upload.single("upload"),
+  async (req, res) => {
+    console.log(req.fileError);
+    if (req.fileError) {
+      return res.send("WRONG PASSPHRASE!");
+    }
+
+    try {
+      const result = await db.insertFile(
+        req.session.data.user.type,
+        req.session.data.user.id,
+        req.file.filename
+      );
+      return res.json({ status: "success" });
+    } catch (err) {
+      return res.json({ error: err });
+    }
+  }
+);
 
 app.post("/logout", auth.checkAuth, (req, res) => {
   req.session.destroy();

@@ -13,7 +13,8 @@ export async function createDB() {
       height int DEFAULT 0,
       weight int DEFAULT 0,
       address text DEFAULT '',
-      allergies text DEFAULT ''
+      allergies text DEFAULT '',
+      pass varchar(100)
        
     );
 
@@ -67,6 +68,30 @@ export async function createDB() {
     await client.query(`
     ALTER TABLE ORGS
     ADD IF NOT EXISTS status STATUS DEFAULT 'pending' ;`);
+  } catch (error) {
+    console.log(error);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS USER_FILES (
+      id BIGINT NOT NULL,
+      filename varchar(50) NOT NULL,
+      PRIMARY KEY(id, filename),
+      CONSTRAINT fk_user_file_id
+          FOREIGN KEY(id) 
+        REFERENCES users(id)
+        ON DELETE CASCADE
+    );
+    CREATE TABLE IF NOT EXISTS ORG_FILES (
+      id BIGINT NOT NULL,
+      filename varchar(50) NOT NULL,
+      PRIMARY KEY(id, filename),
+      CONSTRAINT fk_org_file_id
+          FOREIGN KEY(id) 
+        REFERENCES orgs(id)
+        ON DELETE CASCADE
+    );
+    `);
   } catch (error) {
     console.log(error);
   }

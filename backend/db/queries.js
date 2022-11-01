@@ -173,3 +173,81 @@ export async function approveApplication(id, type) {
     }
   }
 }
+export async function insertFile(type, id, filename) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `INSERT INTO USER_FILES VALUES ($1,$2);`,
+        [id, filename]
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  if (type == "org") {
+    try {
+      const result = await client.query(
+        `INSERT INTO ORG_FILES VALUES ($1,$2);`,
+        [id, filename]
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+}
+export async function updatePassphrase(pass, type, id) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `UPDATE USERS SET PASS = $1 WHERE id = $2;`,
+        [pass, id]
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  if (type == "org") {
+    try {
+      const result = await client.query(
+        `UPDATE USERS SET PASS = $1 WHERE id = $2;`,
+        [pass, id]
+      );
+      return result.rows;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+}
+export async function getPassphrase(type, id) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `SELECT PASS FROM USERS WHERE id = $1;`,
+        [id]
+      );
+      return result.rows[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  if (type == "org") {
+    try {
+      const result = await client.query(
+        `SELECT PASS FROM USERS WHERE id = $1;`,
+        [id]
+      );
+      return result.rows[0];
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+}

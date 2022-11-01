@@ -69,10 +69,10 @@
   <% if ( typeof data.user !='undefined' ){ %>
     <% if(data.user.role=='admin' ) {%>
       <form action="/admin/getapplications" method="GET">
-        <button type="submit" name = "type" value = "user">
+        <button type="submit" name="type" value="user">
           <h2>See all Pending User Applications</h2>
         </button>
-        <button type="submit" name = "type" value = "org">
+        <button type="submit" name="type" value="org">
           <h2>See all Pending Org Applications</h2>
         </button>
       </form>
@@ -123,13 +123,31 @@
       </form>
       <% }} %>
 </div>
+<form action="/passphrase" method="POST">
+  <div>
+    <label for="id">Enter a passphrase for file upload verification</label>
+    <input type="password" id="updateField" name="pass" required />
+  </div>
+  <div>
+    <label for="otp">Enter OTP</label>
+    <input type="text" id="otp" name="otp" />
+  </div>
+  <button type="submit" name="getOtp">Get otp</button>
+  <button type="submit">
+    <h3>Add passphrase</h3>
+  </button>
+</form>
 
 <form action="/upload" method="POST" enctype="multipart/form-data">
   <div>
-    <label for="id">Choose File</label>
-    <input type="file" id="updateField" name="upload" />
+    <label for="pass">Enter your registered passphrase</label>
+    <input type="text" id="updateField" name="pass" required />
   </div>
-  
+  <div>
+    <label for="id">Choose File</label>
+    <input type="file" id="updateField" name="upload" required />
+  </div>
+
   <button type="submit">
     <h3>Upload</h3>
   </button>

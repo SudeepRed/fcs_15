@@ -9,7 +9,7 @@ const MAIL_SETTINGS = {
     pass: process.env.PASSWORD,
   },
 };
-const cryptr = new Cryptr(process.env.CRYPTR_SECRET);
+const cryptr = new Cryptr(process.env.OTP_SECRET);
 
 const transporter = nodemailer.createTransport(MAIL_SETTINGS);
 
@@ -18,6 +18,7 @@ function genrateOtp() {
   const otp = cryptr.encrypt(Date.now());
   return otp;
 }
+
 export async function sendMail(email) {
   const otp = genrateOtp();
   try {
