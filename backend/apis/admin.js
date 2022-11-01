@@ -23,3 +23,26 @@ router.post("/approve", async (req, res) => {
     console.log(err);
   }
 });
+router.get("/showall", async (req, res) => {
+  try {
+    const users = await db.getUsers();
+    const orgs = await db.getOrgs();
+    const data = {
+      users: users,
+      orgs: orgs,
+    }
+    req.session.data.all = data;
+    return res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+});
+
+router.post("/delete", async (req, res) => {
+  try {
+    const result = await db.deleteEntity(req.body.type, req.body.id);
+    return res.redirect("/");
+  } catch (err) {
+    console.log(err);
+  }
+});

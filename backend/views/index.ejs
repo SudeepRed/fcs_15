@@ -69,6 +69,11 @@
 <div>
   <% if ( typeof data.user !='undefined' ){ %>
     <% if(data.user.role=='admin' ) {%>
+      <form action="/admin/showall" method="GET">
+        <button type="submit">
+          <h2>See all Entities</h2>
+        </button>
+      </form>
       <form action="/admin/getapplications" method="GET">
         <button type="submit" name="type" value="user">
           <h2>See all Pending User Applications</h2>
@@ -79,16 +84,7 @@
       </form>
       <% }} %>
 </div>
-<div>
-  <% if ( typeof data.user !='undefined' ){ %>
-    <% if(data.user.role=='admin' ) {%>
-      <form action="/admin/getapplications" method="GET">
-        <button type="submit">
-          <h2>See all Pending Org Applications</h2>
-        </button>
-      </form>
-      <% }} %>
-</div>
+
 <div>
   <% if ( typeof data.applications !='undefined' ){ %>
     <% data.applications.forEach(function(application) { %>
@@ -101,7 +97,26 @@
 
       <% }) %>
         <% } %>
+          <% if ( typeof data.all !='undefined' ){ %>
+            <% data.all.users.forEach(function(application) { %>
 
+              <p>
+                <%= application.id %>
+                  <%= application.name %>
+                    <%= application.email %>
+              </p>
+
+              <% }) %>
+                <% data.all.orgs.forEach(function(application) { %>
+
+                  <p>
+                    <%= application.id %>
+                      <%= application.name %>
+                        <%= application.domain %>
+                  </p>
+
+                  <% }) %>
+                    <% } %>
 </div>
 <div>
   <% if ( typeof data.user !='undefined' ){ %>
@@ -122,6 +137,22 @@
           <h3>Approve</h3>
         </button>
       </form>
+      <form action="/admin/delete" method="POST">
+        <div>
+          <label for="id">Enter application ID</label>
+          <input type="number" id="updateField" name="id" />
+        </div>
+        <div>
+          <label for="type">Select Type</label>
+          <select name="type" id="type" required>
+            <option value="org">Organization</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+        <button type="submit">
+          <h3>Delete Entity</h3>
+        </button>
+      </form>
       <% }} %>
 </div>
 <form action="/passphrase" method="POST">
@@ -134,9 +165,7 @@
     <input type="text" id="otp" name="otp" />
   </div>
   <button type="submit" name="getOtp">Get otp</button>
-  <button type="submit">
-    Add passphrase
-  </button>
+  <button type="submit">Add passphrase</button>
 </form>
 
 <form action="/upload" method="POST" enctype="multipart/form-data">
@@ -160,12 +189,12 @@
     </select>
   </div>
 
-  <button type="submit">
-    Upload & Share
-  </button>
+  <button type="submit">Upload & Share</button>
 </form>
 <form action="/getFiles" method="GET">
-  <button type="submit">Download shared applications (only for professionals)</button>
+  <button type="submit">
+    Download shared applications (only for professionals)
+  </button>
 </form>
 <div>
   <form action="/getMyFiles" method="GET">

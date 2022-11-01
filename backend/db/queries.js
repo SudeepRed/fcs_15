@@ -307,3 +307,49 @@ export async function deleteMyFile(type, name) {
       return { status: "failed" };
     }
 }
+
+export async function getUsers() {
+  try {
+    const result = await client.query(`SELECT id, name, email FROM USERS;`);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return { status: "failed" };
+  }
+}
+export async function getOgs() {
+  try {
+    const result = await client.query(`SELECT id, name, domain FROM ORGS;`);
+    return result.rows;
+  } catch (e) {
+    console.log(e);
+    return { status: "failed" };
+  }
+}
+
+export async function deleteEntity(type, id) {
+  if (type == "user") {
+    try {
+      const result = await client.query(
+        `DELETE FROM USERS WHERE id = $1 AND role != 'admin';`,
+        [id]
+      );
+      return result;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+  if (type == "org") {
+    try {
+      const result = await client.query(
+        `DELETE FROM ORGS WHERE id= $1;`,
+        [id]
+      );
+      return result;
+    } catch (e) {
+      console.log(e);
+      return null;
+    }
+  }
+}
