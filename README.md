@@ -1,3 +1,19 @@
+# FCS October Milestone
+## Note-
+1. To register please give a real email id, the otp would be send to that.
+2. Only Patients can buy Medicines.
+3. Claims are resolved by the insurance company
+4. Each user is given 100 points in thier wallet when they register.
+## Final Tech Stack
+1. Frontend
+    1. React
+    2. SCSS
+    3. EJS for templating
+2. Backend
+    1. Node.js
+3. Database: PostgreSQL
+4. Webserver: Nginx
+
 # FCS September Milestone
 ### Group 15
 1. Harshit Singh(2019424)
