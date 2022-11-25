@@ -4,6 +4,7 @@ import { createDB } from "./db/schema.js";
 import * as db from "./db/queries.js";
 import * as bcrypt from "bcrypt";
 import * as auth from "./controllers/basicAuth.js";
+import * as file from "./controllers/file.js";
 import session from "express-session";
 import * as role from "./constants/role.js";
 import * as roleAuth from "./controllers/role.js";
@@ -14,7 +15,6 @@ import { v4 as uuid } from "uuid";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
-import zip from "express-zip";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,9 +42,22 @@ const uploadDoc = multer({
     cb(null, ret);
   },
 });
+const FILE_SIZE = 1*1024*1024; //1MB
 const uploadPOI = multer({
   storage: storage,
-  limits: { fileSize: 1e7 },
+  limits: { fileSize: FILE_SIZE*10 },
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg"
+    ) {
+      cb(null, true);
+    } else {
+      cb(null, false);
+      return cb("Only .png, .jpg and .jpeg format allowed as POI!");
+    }
+  },
 });
 dotenv.config();
 const app = express();
@@ -67,6 +80,7 @@ app.use(
 );
 app.use("/user", user.router);
 app.use("/admin", admin.router);
+
 app.get(
   "/health",
   auth.checkAuth,
@@ -90,55 +104,66 @@ app.get("/register", (req, res) => {
     message: "",
   });
 });
-app.post(
-  "/registeruser",
-  auth.checkNotAuth,
-  uploadPOI.single("upload"),
-  async (req, res) => {
-    if (req.body.getOtp != undefined && req.body.register == undefined) {
-      otp.sendMail(req.body.email);
-      return;
+
+const checkUpload = uploadPOI.single("upload");
+app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
+  checkUpload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading.
+      res.send(err.message + "Should be less than 10mb");
+      console.log(err);
+    } else if (err) {
+      // An unknown error occurred when uploading.
+      res.send("An unknown error occurred");
+      console.log(err);
     }
-    if (req.body.register != undefined && req.body.getOtp == undefined) {
-      if (otp.verifyOtp(req.body.otp)) {
-        try {
-          if (
-            req.body.role == role.USER_ROLE.PATIENT ||
-            req.body.role == role.USER_ROLE.PROFESSIONAL
-          ) {
-            const salt = await bcrypt.genSalt(10);
-            const hashedPassword = await bcrypt.hash(req.body.password, salt);
-            const id = Date.now() + Math.floor(Math.random() * 100000);
-            const user = {
-              id: id,
-              name: req.body.name,
-              email: req.body.email,
-              password: hashedPassword,
-              age: req.body.age || 0,
-              role: req.body.role,
-            };
-            await db.createUser(user);
-            await db.insertPOI(id, req.file.filename, "user");
-            res.redirect("/login");
-          } else {
-            return res.render("register.ejs", {
-              message: "Role can only be patient or professional",
-            });
-          }
-        } catch (error) {
-          console.log(error);
+
+    // Everything went fine.
+    return;
+  });
+  if (req.body.getOtp != undefined && req.body.register == undefined) {
+    otp.sendMail(req.body.email);
+    return;
+  }
+  if (req.body.register != undefined && req.body.getOtp == undefined) {
+    if (otp.verifyOtp(req.body.otp)) {
+      try {
+        if (
+          req.body.role == role.USER_ROLE.PATIENT ||
+          req.body.role == role.USER_ROLE.PROFESSIONAL
+        ) {
+          const salt = await bcrypt.genSalt(10);
+          const hashedPassword = await bcrypt.hash(req.body.password, salt);
+          const id = Date.now() + Math.floor(Math.random() * 100000);
+          const user = {
+            id: id,
+            name: req.body.name,
+            email: req.body.email,
+            password: hashedPassword,
+            age: req.body.age || 0,
+            role: req.body.role,
+          };
+          await db.createUser(user);
+          await db.insertPOI(id, req.file.filename, "user");
+          res.redirect("/login");
+        } else {
           return res.render("register.ejs", {
-            message: "Something went wrong. Please try again.",
+            message: "Role can only be patient or professional",
           });
         }
-      } else {
+      } catch (error) {
+        console.log(error);
         return res.render("register.ejs", {
-          message: "Please enter the correct otp",
+          message: "Something went wrong. Please try again.",
         });
       }
+    } else {
+      return res.render("register.ejs", {
+        message: "Please enter the correct otp",
+      });
     }
   }
-);
+});
 
 app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
   if (req.body.getOtp != undefined && req.body.register == undefined) {

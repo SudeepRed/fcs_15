@@ -20,6 +20,7 @@ function genrateOtp() {
 }
 
 export async function sendMail(email) {
+  console.log("Here")
   const otp = genrateOtp();
   try {
     let info = await transporter.sendMail({
