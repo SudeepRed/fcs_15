@@ -1,260 +1,325 @@
-<div>
-  <% if ( typeof data.user !='undefined' ){ %>
-    <h2>hello <%= data.user.name %> !</h2>
-    <p>You are a <%= data.user.role %>
-    </p>
-    <p>
-      <%= JSON.stringify(data.user) %>
-    </p>
-    <% } %>
-</div>
-<div>
-  <% if ( typeof data.orgs !='undefined' ){ %>
-    <% data.orgs.forEach(function(org) { %>
-      <p>
-        <%= org.name %>
-      </p>
-      <% }) %>
-        <% } %>
-          <form action="/user/getorgs" method="GET">
-            <button type="submit">Get orgs</button>
-          </form>
-</div>
-<div>
-  <% if ( typeof data.professionals !='undefined' ){ %>
-    <% data.professionals.forEach(function(professionals) { %>
-      <p>
-        <%= professionals.id %>
-          <%= professionals.name %>
-            <%= professionals.role %>
-      </p>
-      <% }) %>
-        <% } %>
-          <form action="/user/getprofessionals" method="GET">
-            <button type="submit">Get professionals</button>
-          </form>
-</div>
+<!DOCTYPE html>
+<html lang="en">
 
-<form action="/logout" method="POST">
-  <button type="submit">Log Out</button>
-</form>
-<form action="/user/editprofile" method="POST">
-  <div>
-    <label for="name">Name</label>
-    <input type="text" id="updateField" name="name" />
-  </div>
-  <div>
-    <label>age</label>
-    <input type="number" id="updateField" name="age" />
-  </div>
-  <div>
-    <label>height</label>
-    <input type="number" id="updateField" name="height" />
-  </div>
-  <div>
-    <label>weight</label>
-    <input type="number" id="updateField" name="weight" />
-  </div>
-  <div>
-    <label>address</label>
-    <input type="text" id="updateField" name="address" />
-  </div>
-  <div>
-    <label>allergies</label>
-    <input type="text" id="updateField" name="allergies" />
-  </div>
-  <button type="submit">UpdateProfile</button>
-</form>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="css/style.css">
+  <title>Home</title>
+</head>
 
-<div>
-  <% if ( typeof data.user !='undefined' ){ %>
-    <% if(data.user.role=='admin' ) {%>
-      <form action="/admin/showall" method="GET">
-        <button type="submit">
-          <h2>See all Entities</h2>
-        </button>
-      </form>
-      <form action="/admin/getapplications" method="GET">
-        <button type="submit" name="type" value="user">
-          <h2>See all Pending User Applications</h2>
-        </button>
-        <button type="submit" name="type" value="org">
-          <h2>See all Pending Org Applications</h2>
-        </button>
-      </form>
-      <% }} %>
-</div>
-
-<div>
-  <% if ( typeof data.applications !='undefined' ){ %>
-    <% data.applications.forEach(function(application) { %>
-
-      <p>
-        <%= application.id %>
-          <%= application.name %>
-            <%= application.role %>
-      </p>
-
-      <% }) %>
-        <% } %>
-          <% if ( typeof data.all !='undefined' ){ %>
-            <% data.all.users.forEach(function(application) { %>
-
-              <p>
-                <%= application.id %>
-                  <%= application.name %>
-                    <%= application.email %>
-              </p>
-
-              <% }) %>
-                <% data.all.orgs.forEach(function(application) { %>
-
-                  <p>
-                    <%= application.id %>
-                      <%= application.name %>
-                        <%= application.domain %>
-                  </p>
-
-                  <% }) %>
-                    <% } %>
-</div>
-<div>
-  <% if ( typeof data.user !='undefined' ){ %>
-    <% if(data.user.role=='admin' ) {%>
-      <form action="/admin/approve" method="POST">
-        <div>
-          <label for="id">Enter application ID</label>
-          <input type="number" id="updateField" name="id" />
-        </div>
-        <div>
-          <label for="type">Select Type</label>
-          <select name="type" id="type" required>
-            <option value="org">Organization</option>
-            <option value="user">User</option>
-          </select>
-        </div>
-        <button type="submit">
-          <h3>Approve</h3>
-        </button>
-      </form>
-      <form action="/admin/delete" method="POST">
-        <div>
-          <label for="id">Enter application ID</label>
-          <input type="number" id="updateField" name="id" />
-        </div>
-        <div>
-          <label for="type">Select Type</label>
-          <select name="type" id="type" required>
-            <option value="org">Organization</option>
-            <option value="user">User</option>
-          </select>
-        </div>
-        <button type="submit">
-          <h3>Delete Entity</h3>
-        </button>
-      </form>
-      <% }} %>
-</div>
-<form action="/passphrase" method="POST">
-  <div>
-    <label for="id">Enter a passphrase for file upload verification</label>
-    <input type="password" id="updateField" name="pass" required />
-  </div>
-  <div>
-    <label for="otp">Enter OTP</label>
-    <input type="text" id="otp" name="otp" />
-  </div>
-  <button type="submit" name="getOtp">Get otp</button>
-  <button type="submit">Add passphrase</button>
-</form>
-
-<form action="/upload" method="POST" enctype="multipart/form-data">
-  <div>
-    <label for="pass">Enter your registered passphrase</label>
-    <input type="text" id="updateField" name="pass" required />
-  </div>
-  <div>
-    <label for="id">Choose File</label>
-    <input type="file" id="updateField" name="upload" required />
-  </div>
-  <div>
-    <label for="id">Enter id to share file</label>
-    <input type="text" id="updateField" name="rid" required />
-  </div>
-  <div>
-    <label for="type">Select Type</label>
-    <select name="type" id="type" required>
-      <option value="org">Organization</option>
-      <option value="user">User</option>
-    </select>
-  </div>
-
-  <button type="submit">Upload & Share</button>
-</form>
-<form action="/getFiles" method="GET">
-  <button type="submit">
-    Download shared applications (only for professionals)
-  </button>
-</form>
-<div>
-  <form action="/getMyFiles" method="GET">
-    <button type="submit">Get My Files</button>
+<body>
+  <form action="/logout" method="POST">
+    <button type="submit">Log Out</button>
   </form>
-
-  <form action="/download" method="POST">
-    <button type="submit">Download My Files</button>
-  </form>
-  <form action="/deletefile" method="POST">
+  <div>
+    <% if ( typeof data.user !='undefined' ){ %>
+      <h1>Hello <b>
+          <%= data.user.name %>
+        </b> ! </h1>
+      <h2>You are a <%= data.user.role %>
+      </h2>
+      <p>
+        <!-- <%= JSON.stringify(data.user) %><br> -->
+        <b>Name: </b>
+        <%= data.user.name %><br>
+          <b>Your Email: </b>
+          <%= data.user.email %><br>
+            <b>Your Age: </b>
+            <%= data.user.age || "Not yet updated" %><br>
+              <b>Your Height: </b>
+              <%= data.user.height || "Not yet updated" %><br>
+                <b>Your Weight: </b>
+                <%= data.user.weight || "Not yet updated" %><br>
+                  <b>Your address: : </b>
+                  <%= data.user.address || "Not yet updated" %><br>
+                    <b>Your allergies: : </b>
+                    <%= data.user.allergies || "none" %><br>
+                      <b>Wallet Amount: : </b>
+                      <%= data.user.wallet %><br>
+                        your application is <b>
+                          <%= data.user.status %>
+                        </b><br>
+      </p>
+      <% } %>
+  </div>
+  
+  <div style="display:flex; flex-direction: row;">
     <div>
-      <label for="id">Enter file name to be deleted</label>
-      <input type="text" id="updateField" name="name" required />
+      <% if ( typeof data.orgs !='undefined' ){ %>
+        <% data.orgs.forEach(function(org) { %>
+          <p>
+            <%= org.name %>
+          </p>
+          <% }) %>
+            <% } %>
+              <form action="/user/getorgs" method="GET">
+                <button type="submit">Get orgs</button>
+              </form>
     </div>
-    <button type="submit">Delete My Files</button>
-  </form>
-</div>
-<div>
-  <% if ( typeof data.drugs !='undefined' ){ %>
-    <% data.drugs.forEach(function(drug) { %>
-      <p>
-        <%= drug.id %>
-          <%= drug.name %>
-            <%= drug.price %>
-      </p>
-      <% }) %>
-        <% } %>
-          <form action="/user/showdrugs" method="GET">
-            <button type="submit">SHOW DRUGS</button>
-          </form>
-          <form action="/user/buydrug" method="POST">
-            <div>
-              <label for="drug">ENTER DRUG ID TO PRUCHASE</label>
-              <input type="number" id="updateField" name="id" required />
-            </div>
-            <button type="submit">BUY DRUG</button>
-          </form>
-</div>
-<% if ( typeof data.user !='undefined' ){ %>
-  <% if(data.user.role=='insurance' ) {%>
-    <form action="/user/showclaims" method="GET">
-      
-      <button type="submit">
-        Show all PENDING Claims raised
-      </button>
-    </form>
-    <form action="/user/refund" method="POST">
-      <div>
-        <label for="id">Enter Claim ID</label>
-        <input type="number" id="updateField" name="id" />
-      </div>
-     
-      <button type="submit">
-        <h3>Refund Claim</h3>
-      </button>
-    </form>
-    <% }} %>
+    <div>
+      <% if ( typeof data.professionals !='undefined' ){ %>
+        <% data.professionals.forEach(function(professionals) { %>
+          <p>
+            <%= professionals.id %>
+              <%= professionals.name %>
+                <%= professionals.role %>
+          </p>
+          <% }) %>
+            <% } %>
+              <form action="/user/getprofessionals" method="GET">
+                <button type="submit">Get professionals</button>
+              </form>
+    </div>
+  </div>
+  
 
-<form action="/logout" method="POST">
-  <button type="submit">
-    <h1>Log Out</h1>
-  </button>
-</form>
+
+  <form action="/user/editprofile" method="POST">
+    <div>
+      <label for="name">Name</label>
+      <input type="text" id="updateField" name="name" />
+    </div>
+    <div>
+      <label>age</label>
+      <input type="number" id="updateField" name="age" />
+    </div>
+    <div>
+      <label>height</label>
+      <input type="number" id="updateField" name="height" />
+    </div>
+    <div>
+      <label>weight</label>
+      <input type="number" id="updateField" name="weight" />
+    </div>
+    <div>
+      <label>address</label>
+      <input type="text" id="updateField" name="address" />
+    </div>
+    <div>
+      <label>allergies</label>
+      <input type="text" id="updateField" name="allergies" />
+    </div>
+    <button type="submit">UpdateProfile</button>
+  </form>
+  
+
+  <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+    <% if ( typeof data.user !='undefined' ){ %>
+      <% if(data.user.role=='admin' ) {%>
+        <div>
+          <form action="/admin/showall" method="GET">
+            <button type="submit">
+              <h3>See all Entities</h3>
+            </button>
+          </form>
+        </div>
+        <form action="/admin/getapplications" method="GET">
+          <button type="submit" name="type" value="user">
+            <h3>See all Pending User Applications</h3>
+          </button>
+        </form>
+        <form action="/admin/getapplications" method="GET">
+          <button type="submit" name="type" value="org">
+            <h3>See all Pending Org Applications</h3>
+          </button>
+        </form>
+
+
+
+        <% }} %>
+  </div>
+
+
+  <div>
+    <% if ( typeof data.applications !='undefined' && data.applications.length> 0 ){ %>
+      <h3>Pending Applications</h3>
+      <% data.applications.forEach(function(application) { %>
+
+        <p>
+          <%= application.id %>
+            <%= application.name %>
+              <%= application.role %>
+
+        </p>
+
+        <% }) %>
+          <% } %>
+            <% if ( typeof data.all !='undefined' ){ %>
+              <h3>All Entities</h3>
+              <% data.all.users.forEach(function(application) { %>
+
+                <p>
+                  <%= application.id %>
+                    <%= application.name %>
+                      <%= application.email %>
+                </p>
+
+                <% }) %>
+                  <% data.all.orgs.forEach(function(application) { %>
+
+                    <p>
+                      <%= application.id %>
+                        <%= application.name %>
+                          <%= application.domain %>
+                    </p>
+
+                    <% }) %>
+                    
+                      <% } %>
+                      
+  </div>
+  
+  <div>
+    <% if ( typeof data.user !='undefined' ){ %>
+      <% if(data.user.role=='admin' ) {%>
+        <form action="/admin/download" method="POST">
+          <div>
+            <label for="id">Enter application ID</label>
+            <input type="number" id="updateField" name="id" />
+          </div>
+          <button type="submit">
+            <h3>Download POI Documents</h3>
+          </button>
+        </form>
+        <form action="/admin/approve" method="POST">
+          <div>
+            <label for="id">Enter application ID</label>
+            <input type="number" id="updateField" name="id" />
+          </div>
+          <div>
+            <label for="type">Select Type</label>
+            <select name="type" id="type" required>
+              <option value="org">Organization</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <button type="submit">
+            <h3>Approve</h3>
+          </button>
+        </form>
+        <form action="/admin/delete" method="POST">
+          <div>
+            <label for="id">Enter application ID</label>
+            <input type="number" id="updateField" name="id" />
+          </div>
+          <div>
+            <label for="type">Select Type</label>
+            <select name="type" id="type" required>
+              <option value="org">Organization</option>
+              <option value="user">User</option>
+            </select>
+          </div>
+          <button type="submit">
+            <h3>Delete Entity</h3>
+          </button>
+        </form>
+        <% }} %>
+  </div>
+  <form action="/passphrase" method="POST">
+    <div>
+      <label for="id">Enter a passphrase for file upload verification</label>
+      <input type="password" id="updateField" name="pass" required />
+    </div>
+    <div>
+      <label for="otp">Enter OTP</label>
+      <input type="text" id="otp" name="otp" />
+    </div>
+    <button type="submit" name="getOtp">Get otp</button>
+    <button type="submit">Add passphrase</button>
+  </form>
+
+  <form action="/upload" method="POST" enctype="multipart/form-data">
+    <div>
+      <label for="pass">Enter your registered passphrase</label>
+      <input type="text" id="updateField" name="pass" required />
+    </div>
+    <div>
+      <label for="id">Choose File</label>
+      <input type="file" id="updateField" name="upload" required />
+    </div>
+    <div>
+      <label for="id">Enter id to share file</label>
+      <input type="text" id="updateField" name="rid" required />
+    </div>
+    <div>
+      <label for="type">Select Type</label>
+      <select name="type" id="type" required>
+        <option value="org">Organization</option>
+        <option value="user">User</option>
+      </select>
+    </div>
+
+    <button type="submit">Upload & Share</button>
+  </form>
+  <form action="/getFiles" method="GET">
+    <button type="submit">
+      Download shared applications (only for professionals)
+    </button>
+  </form>
+  <div>
+    <form action="/getMyFiles" method="GET">
+      <button type="submit">Get My Files</button>
+    </form>
+
+    <form action="/download" method="POST">
+      <button type="submit">Download My Files</button>
+    </form>
+    <form action="/deletefile" method="POST">
+      <div>
+        <label for="id">Enter file name to be deleted</label>
+        <input type="text" id="updateField" name="name" required />
+      </div>
+      <button type="submit">Delete My Files</button>
+    </form>
+  </div>
+  <div>
+    <% if ( typeof data.drugs !='undefined' ){ %>
+      <% data.drugs.forEach(function(drug) { %>
+        <p>
+          <%= drug.id %>
+            <%= drug.name %>
+              <%= drug.price %>
+        </p>
+        <% }) %>
+          <% } %>
+            <form action="/user/showdrugs" method="GET">
+              <button type="submit">SHOW DRUGS</button>
+            </form>
+            <form action="/user/buydrug" method="POST">
+              <div>
+                <label for="drug">ENTER DRUG ID TO PRUCHASE</label>
+                <input type="number" id="updateField" name="id" required />
+              </div>
+              <button type="submit">BUY DRUG</button>
+            </form>
+  </div>
+  <% if ( typeof data.user !='undefined' ){ %>
+    <% if(data.user.role=='insurance' ) {%>
+      <form action="/user/showclaims" method="GET">
+
+        <button type="submit">
+          Show all PENDING Claims raised
+        </button>
+      </form>
+      <form action="/user/refund" method="POST">
+        <div>
+          <label for="id">Enter Claim ID</label>
+          <input type="number" id="updateField" name="id" />
+        </div>
+
+        <button type="submit">
+          <h3>Refund Claim</h3>
+        </button>
+      </form>
+      <% }} %>
+
+        <form action="/logout" method="POST">
+          <button type="submit">
+            <h1>Log Out</h1>
+          </button>
+        </form>
+</body>
+
+</html>

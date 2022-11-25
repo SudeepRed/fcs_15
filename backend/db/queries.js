@@ -413,4 +413,19 @@ export async function refundAmount(time) {
     console.log(e);
   }
 }
+export async function insertPOI(id, filename, type) {
+  try {
+    await client.query(`INSERT INTO POI VALUES ($1, $2, $3)`,[id, filename, type]);
+  } catch (e) {
+    console.log(e);
+  }
+}
+export async function getPOI(id) {
+  try {
+    const res = await client.query(`SELECT filename from POI WHERE id = $1`,[id]);
+    return res.rows;
+  } catch (e) {
+    console.log(e);
+  }
+}
 

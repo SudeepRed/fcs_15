@@ -152,5 +152,18 @@ export async function createDB() {
   } catch (error) {
     console.log(error);
   }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS POI (
+      id bigint ,
+      filename varchar(100) ,
+      type varchar(50),
+      PRIMARY KEY (id, filename, type)
+      )
+
+    `);
+  } catch (error) {
+    console.log(error);
+  }
   //END
 }

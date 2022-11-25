@@ -30,7 +30,7 @@ router.get("/showall", async (req, res) => {
     const data = {
       users: users,
       orgs: orgs,
-    }
+    };
     req.session.data.all = data;
     return res.redirect("/");
   } catch (err) {
@@ -44,5 +44,24 @@ router.post("/delete", async (req, res) => {
     return res.redirect("/");
   } catch (err) {
     console.log(err);
+  }
+});
+router.post("/download", async (req, res) => {
+  try {
+    const myFiles = await db.getPOI(req.body.id);
+    let files = [];
+    const dir = "./db/uploads/";
+    myFiles.forEach((file) => {
+      console.log(dir + file.filename);
+      files.push({
+        path: dir + file.filename,
+        name: file.filename,
+      });
+    });
+    let zipFilename = req.body.id.toString() + ".zip"
+    res.zip(files,  zipFilename );
+  } catch (error) {
+    console.log(error);
+    res.send("failed to get POI");
   }
 });

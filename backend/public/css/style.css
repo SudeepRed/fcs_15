@@ -1,0 +1,27 @@
+
+form{
+    margin: 10px;
+}
+button {
+  font-weight: semib;
+  border-style: none;
+  border-radius: 5px;
+  font-size: 1.5em;
+  background: rgb(218, 158, 158);
+  padding: 0.5em;
+  margin-top: 10px;
+  margin-right:10px;
+}
+button:hover {
+  background: black;
+  color: white;
+}
+.buttons {
+  padding: 10px;
+}
+.line{
+    height:5px;
+    background:black;
+    width:80vw;
+    margin: auto;
+}

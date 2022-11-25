@@ -29,8 +29,9 @@ const storage = multer.diskStorage({
     cb(null, filename);
   },
 });
-const upload = multer({
+const uploadDoc = multer({
   storage: storage,
+  limits: { fileSize: 10 },
   fileFilter: async function (req, file, cb) {
     const ret = await auth.verifyFile(req);
     if (ret == true) {
@@ -41,6 +42,10 @@ const upload = multer({
     cb(null, ret);
   },
 });
+const uploadPOI = multer({
+  storage: storage,
+  limits: { fileSize: 1e7 },
+});
 dotenv.config();
 const app = express();
 app.use(express.json());
@@ -50,7 +55,9 @@ app.use(
   })
 );
 app.use(express.static("db"));
+app.use(express.static("public"));
 app.set("view-engine", "ejs");
+
 app.use(
   session({
     secret: process.env.SESSION_SECRET,
@@ -83,48 +90,55 @@ app.get("/register", (req, res) => {
     message: "",
   });
 });
-app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
-  if (req.body.getOtp != undefined && req.body.register == undefined) {
-    otp.sendMail(req.body.email);
-    return;
-  }
-  if (req.body.register != undefined && req.body.getOtp == undefined) {
-    if (otp.verifyOtp(req.body.otp)) {
-      try {
-        if (
-          req.body.role == role.USER_ROLE.PATIENT ||
-          req.body.role == role.USER_ROLE.PROFESSIONAL
-        ) {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(req.body.password, salt);
-          const user = {
-            id: Date.now(),
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword,
-            age: req.body.age || 0,
-            role: req.body.role,
-          };
-          db.createUser(user);
-          res.redirect("/login");
-        } else {
+app.post(
+  "/registeruser",
+  auth.checkNotAuth,
+  uploadPOI.single("upload"),
+  async (req, res) => {
+    if (req.body.getOtp != undefined && req.body.register == undefined) {
+      otp.sendMail(req.body.email);
+      return;
+    }
+    if (req.body.register != undefined && req.body.getOtp == undefined) {
+      if (otp.verifyOtp(req.body.otp)) {
+        try {
+          if (
+            req.body.role == role.USER_ROLE.PATIENT ||
+            req.body.role == role.USER_ROLE.PROFESSIONAL
+          ) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const id = Date.now() + Math.floor(Math.random() * 100000);
+            const user = {
+              id: id,
+              name: req.body.name,
+              email: req.body.email,
+              password: hashedPassword,
+              age: req.body.age || 0,
+              role: req.body.role,
+            };
+            await db.createUser(user);
+            await db.insertPOI(id, req.file.filename, "user");
+            res.redirect("/login");
+          } else {
+            return res.render("register.ejs", {
+              message: "Role can only be patient or professional",
+            });
+          }
+        } catch (error) {
+          console.log(error);
           return res.render("register.ejs", {
-            message: "Role can only be patient or professional",
+            message: "Something went wrong. Please try again.",
           });
         }
-      } catch (error) {
-        console.log(error);
+      } else {
         return res.render("register.ejs", {
-          message: "Something went wrong. Please try again.",
+          message: "Please enter the correct otp",
         });
       }
-    } else {
-      return res.render("register.ejs", {
-        message: "Please enter the correct otp",
-      });
     }
   }
-});
+);
 
 app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
   if (req.body.getOtp != undefined && req.body.register == undefined) {
@@ -152,7 +166,8 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
               description: req.body.description,
               contactDetails: req.body.contactDetails,
             };
-            db.createOrg(org);
+            await db.createOrg(org);
+
             res.redirect("/login");
           } else {
             return res.render("register.ejs", {
@@ -226,9 +241,9 @@ app.post("/download", auth.checkAuth, async (req, res) => {
         name: file.filename,
       });
     });
-    res.zip(files);
-    res.write(JSON.stringify(myFiles));
-    res.end();
+    const zipFilename =
+      "Bhamlo_" + req.session.data.user.id.toString() + ".zip";
+    res.zip(files, zipFilename);
   } catch (error) {
     console.log(error);
     res.send("failed to get myfiles");
@@ -255,7 +270,7 @@ app.post(
 app.post(
   "/upload",
   auth.checkAuth,
-  upload.single("upload"),
+  uploadDoc.single("upload"),
   async (req, res) => {
     if (req.fileError) {
       return res.send("WRONG PASSPHRASE!");
