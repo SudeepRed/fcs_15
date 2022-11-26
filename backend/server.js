@@ -122,13 +122,13 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
       // A Multer error occurred when uploading.
       res.send(err.message + " Should be less than 10mb");
       console.log(err);
-      
+
       logger.error(err);
     } else if (err) {
       // An unknown error occurred when uploading.
       res.send("An unknown error occurred");
       console.log(err);
-      
+
       logger.error(err);
     }
 
@@ -175,7 +175,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
         } catch (err) {
           console.log(err);
           logger.error(err);
-          
+
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
           });
@@ -196,14 +196,27 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
       // A Multer error occurred when uploading.
       res.send(err.message + " Should be less than 10mb");
       console.log(err);
-      
+
       logger.error(err);
     } else if (err) {
       // An unknown error occurred when uploading.
       res.send("An unknown error occurred");
       console.log(err);
-      
+
       logger.error(err);
+    }
+    if (req.files.length < 2) {
+      req.files.forEach((file) => {
+        fs.unlink("./db/uploads/" + file.filename, (err) => {
+          if (err) {
+            res.send("Oops! something went wrong!");
+          }
+          console.log("Uploaded File deleted for org, min 2 files required");
+          logger.info("Uploaded File deleted for org, min 2 files required");
+        });
+      });
+
+      return res.status(400).json({ error: "Minimum of 2 img is required" });
     }
 
     if (req.body.getOtp != undefined && req.body.register == undefined) {
@@ -233,10 +246,10 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
                 contactDetails: req.body.contactDetails,
               };
               await db.createOrg(org);
-              
-              req.files.forEach(async (file) =>{
+
+              req.files.forEach(async (file) => {
                 await db.insertPOI(id, file.filename, "org");
-              })
+              });
               // await db.insertPOI(id, req.file.filename, "user");
               res.redirect("/login");
             } else {
@@ -247,8 +260,28 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
             }
           }
         } catch (err) {
-          console.log(err);          
+          console.log(err);
           logger.error(err);
+          req.files.forEach((file) => {
+            fs.unlink("./db/uploads/" + file.filename, (err) => {
+              try {
+                if (err) {
+                  res.send("Oops! something went wrong!");
+                }
+                console.log(
+                  "Uploaded File deleted for org, min 2 files required"
+                );
+                logger.info(
+                  "Uploaded 1 File deleted for org, min 2 files required"
+                );
+              } catch (err) {
+                console.log(
+                  "Uploaded File deleted for org, min 2 files required"
+                );
+                logger.error(err);
+              }
+            });
+          });
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
           });
@@ -283,7 +316,7 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     logger.error(err);
-    
+
     res.send("failed to get myfiles");
   }
 });
@@ -310,7 +343,7 @@ app.post("/download", auth.checkAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     logger.error(err);
-    
+
     res.send("failed to get myfiles");
   }
 });
@@ -328,7 +361,6 @@ app.post(
       }
       return res.send("deleted");
     } catch (err) {
-      
       logger.error(err);
     }
   }
@@ -387,7 +419,7 @@ app.post(
       return res.json({ status: "success" });
     } catch (err) {
       console.log(err);
-      
+
       logger.error(err);
       return res.json({ error: "An error Occured" });
     }
@@ -426,7 +458,6 @@ app.get(
     } catch (err) {
       console.log(err);
       logger.error(err);
-      
     }
   }
 );
@@ -454,7 +485,7 @@ app.post(
     } catch (err) {
       console.log(err);
       logger.error(err);
-      
+
       return res.json({ error: "An error Occured" });
     }
   }
