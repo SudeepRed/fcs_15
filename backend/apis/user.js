@@ -2,6 +2,8 @@ import { checkAuth } from "../controllers/basicAuth.js";
 import { roleCheck } from "../controllers/role.js";
 import * as roles from "../constants/role.js";
 import * as db from "../db/queries.js";
+import * as logs from "logger";
+let logger = logs.createLogger("./Bhamlo.log");
 import express from "express";
 import { statusCheck } from "../controllers/status.js";
 export const router = express.Router();

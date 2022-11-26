@@ -1,4 +1,6 @@
 import { client } from "./db.js";
+import * as logs from "logger";
+let logger = logs.createLogger("./Bhamlo.log");
 
 export async function createDB() {
   try {

@@ -47,13 +47,11 @@ const uploadAndVerify = multer({
       cb(null, true);
     } else {
       cb(null, false);
-      return cb("Only .png, .jpg and .jpeg format allowed!");
+      return cb("Only .png, .jpg, .jpeg and .pdf format allowed!");
     }
   },
 });
-const FILE_SIZE = 1 * 1024 * 1024;
-// const ipfs = await IPFS.create();
-// ipfs.stop()//1MB
+
 const uploadPOI = multer({
   storage: storage,
   limits: { fileSize: 1e7 },
@@ -67,7 +65,7 @@ const uploadPOI = multer({
       cb(null, true);
     } else {
       cb(null, false);
-      return cb("Only .png, .jpg and .jpeg format allowed as POI!");
+      return cb("Only .png, .jpg, .jpeg and .pdf format allowed!");
     }
   },
 });
@@ -117,20 +115,20 @@ app.get("/register", (req, res) => {
   });
 });
 
-const checkUpload = uploadPOI.single("upload");
+const checkUserPOIUpload = uploadPOI.single("upload");
 app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
-  checkUpload(req, res, async function (err) {
+  checkUserPOIUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       // A Multer error occurred when uploading.
-      res.send(err.message + "Should be less than 10mb");
+      res.send(err.message + " Should be less than 10mb");
       console.log(err);
-      logger.error(err);
+      
       logger.error(err);
     } else if (err) {
       // An unknown error occurred when uploading.
       res.send("An unknown error occurred");
       console.log(err);
-      logger.error(err);
+      
       logger.error(err);
     }
 
@@ -177,7 +175,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
         } catch (err) {
           console.log(err);
           logger.error(err);
-          logger.error(error);
+          
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
           });
@@ -191,55 +189,78 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
   });
 });
 
+const checkOrgPOIUpload = uploadPOI.array("org", 3);
 app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
-  if (req.body.getOtp != undefined && req.body.register == undefined) {
-    otp.sendMail(req.body.domain);
-    return;
-  }
-  if (req.body.register != undefined && req.body.getOtp == undefined) {
-    if (otp.verifyOtp(req.body.otp)) {
-      try {
-        {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(req.body.password, salt);
-          if (
-            req.body.role == role.ORG_ROLE.HOSPITAL ||
-            req.body.role == role.ORG_ROLE.PHARMACY ||
-            req.body.role == role.ORG_ROLE.INSURANCE
-          ) {
-            const org = {
-              id: Date.now(),
-              name: req.body.name,
-              domain: req.body.domain,
-              role: req.body.role,
-              password: hashedPassword,
-              location: req.body.location,
-              description: req.body.description,
-              contactDetails: req.body.contactDetails,
-            };
-            await db.createOrg(org);
+  checkOrgPOIUpload(req, res, async function (err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading.
+      res.send(err.message + " Should be less than 10mb");
+      console.log(err);
+      
+      logger.error(err);
+    } else if (err) {
+      // An unknown error occurred when uploading.
+      res.send("An unknown error occurred");
+      console.log(err);
+      
+      logger.error(err);
+    }
 
-            res.redirect("/login");
-          } else {
-            return res.render("register.ejs", {
-              message: "Wrong ROLE!",
-            });
+    if (req.body.getOtp != undefined && req.body.register == undefined) {
+      otp.sendMail(req.body.domain);
+      return;
+    }
+    if (req.body.register != undefined && req.body.getOtp == undefined) {
+      if (otp.verifyOtp(req.body.otp)) {
+        try {
+          {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            if (
+              req.body.role == role.ORG_ROLE.HOSPITAL ||
+              req.body.role == role.ORG_ROLE.PHARMACY ||
+              req.body.role == role.ORG_ROLE.INSURANCE
+            ) {
+              const id = Date.now() + Math.floor(Math.random() * 100000);
+              const org = {
+                id: id,
+                name: req.body.name,
+                domain: req.body.domain,
+                role: req.body.role,
+                password: hashedPassword,
+                location: req.body.location,
+                description: req.body.description,
+                contactDetails: req.body.contactDetails,
+              };
+              await db.createOrg(org);
+              
+              req.files.forEach(async (file) =>{
+                await db.insertPOI(id, file.filename, "org");
+              })
+              // await db.insertPOI(id, req.file.filename, "user");
+              res.redirect("/login");
+            } else {
+              logger.error("Wrong ORG_ROLE!");
+              return res.render("register.ejs", {
+                message: "Wrong ROLE!",
+              });
+            }
           }
+        } catch (err) {
+          console.log(err);          
+          logger.error(err);
+          return res.render("register.ejs", {
+            message: "Something went wrong. Please try again.",
+          });
         }
-      } catch (err) {
-        console.log(err);
-        logger.error(err);
-        logger.error(error);
+      } else {
+        logger.error("Wrong ORG OTP!");
         return res.render("register.ejs", {
-          message: "Something went wrong. Please try again.",
+          message: "Please enter the correct otp",
         });
       }
-    } else {
-      return res.render("register.ejs", {
-        message: "Please enter the correct otp",
-      });
     }
-  }
+  });
 });
 
 app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
@@ -262,7 +283,7 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     logger.error(err);
-    logger.error(error);
+    
     res.send("failed to get myfiles");
   }
 });
@@ -289,7 +310,7 @@ app.post("/download", auth.checkAuth, async (req, res) => {
   } catch (err) {
     console.log(err);
     logger.error(err);
-    logger.error(error);
+    
     res.send("failed to get myfiles");
   }
 });
@@ -307,8 +328,8 @@ app.post(
       }
       return res.send("deleted");
     } catch (err) {
-      console.log("e");
-      logger.error(e);
+      
+      logger.error(err);
     }
   }
 );
@@ -366,7 +387,7 @@ app.post(
       return res.json({ status: "success" });
     } catch (err) {
       console.log(err);
-      logger.error(err);
+      
       logger.error(err);
       return res.json({ error: "An error Occured" });
     }
@@ -405,7 +426,7 @@ app.get(
     } catch (err) {
       console.log(err);
       logger.error(err);
-      logger.error(e);
+      
     }
   }
 );
@@ -433,7 +454,7 @@ app.post(
     } catch (err) {
       console.log(err);
       logger.error(err);
-      logger.error(err);
+      
       return res.json({ error: "An error Occured" });
     }
   }

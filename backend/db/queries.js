@@ -1,5 +1,6 @@
 import { client } from "./db.js";
-
+import * as logs from "logger";
+let logger = logs.createLogger("./Bhamlo.log");
 export async function createUser(user) {
   try {
     await client.query(
@@ -77,7 +78,7 @@ export async function createOrg(user) {
         user.password,
         user.description,
         user.location,
-        user.contactDetails,
+        user.contactDetail,
       ]
     );
   } catch (err) {

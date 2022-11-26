@@ -1,5 +1,7 @@
 import * as bcrypt from "bcrypt";
 import * as db from "../db/queries.js";
+import * as logs from "logger";
+let logger = logs.createLogger("./Bhamlo.log");
 export async function validateUser(req, res, next) {
   let user =
     req.body.type == "user"

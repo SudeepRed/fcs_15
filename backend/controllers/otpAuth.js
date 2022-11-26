@@ -1,6 +1,8 @@
 import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
+import * as logs from "logger";
+let logger = logs.createLogger("./Bhamlo.log");
 dotenv.config();
 const MAIL_SETTINGS = {
   service: "gmail",

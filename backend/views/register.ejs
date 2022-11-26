@@ -35,7 +35,7 @@
 
   <h1>Organization Register</h1>
 
-  <form action="/registerorg" method="POST">
+  <form action="/registerorg" method="POST"  enctype="multipart/form-data">
     <div>
       <label for="name">Org Name</label>
       <input type="text" id="name" name="name" required />
@@ -67,6 +67,10 @@
     <div>
       <label for="contactDetails">Contact details</label>
       <input type="string" id="contactDetails" name="contactDetails" required />
+    </div>
+    <div>
+      <label for="id">Add proof of identity</label>
+      <input type="file" id="updateField" name="org" required multiple/>
     </div>
     <div>
       <label for="otp">Enter OTP</label>
