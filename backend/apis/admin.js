@@ -3,6 +3,7 @@ import { roleCheck } from "../controllers/role.js";
 import * as roles from "../constants/role.js";
 import * as db from "../db/queries.js";
 import express from "express";
+import fs from "fs";
 export const router = express.Router();
 router.use(checkAuth);
 router.use(roleCheck([roles.USER_ROLE.ADMIN]));
@@ -53,13 +54,18 @@ router.post("/download", async (req, res) => {
     const dir = "./db/uploads/";
     myFiles.forEach((file) => {
       console.log(dir + file.filename);
-      files.push({
-        path: dir + file.filename,
-        name: file.filename,
-      });
+      if (fs.existsSync(dir + file.filename)) {
+        files.push({
+          path: dir + file.filename,
+          name: file.filename,
+        });
+      }
     });
-    let zipFilename = req.body.id.toString() + ".zip"
-    res.zip(files,  zipFilename );
+    if (files.length == 0) {
+      res.send("Oops! Seems like there are no documents");
+    }
+    let zipFilename = req.body.id.toString() + ".zip";
+    res.zip(files, zipFilename);
   } catch (error) {
     console.log(error);
     res.send("failed to get POI");

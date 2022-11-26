@@ -15,6 +15,8 @@ import { v4 as uuid } from "uuid";
 import multer from "multer";
 import path from "path";
 import fs from "fs";
+import zip from "express-zip";
+import * as IPFS from "ipfs-core";
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -42,10 +44,12 @@ const uploadDoc = multer({
     cb(null, ret);
   },
 });
-const FILE_SIZE = 1*1024*1024; //1MB
+const FILE_SIZE = 1 * 1024 * 1024;
+// const ipfs = await IPFS.create();
+// ipfs.stop()//1MB
 const uploadPOI = multer({
   storage: storage,
-  limits: { fileSize: FILE_SIZE*10 },
+  limits: { fileSize: 1e7 },
   fileFilter: (req, file, cb) => {
     if (
       file.mimetype == "image/png" ||
@@ -107,7 +111,7 @@ app.get("/register", (req, res) => {
 
 const checkUpload = uploadPOI.single("upload");
 app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
-  checkUpload(req, res, function (err) {
+  checkUpload(req, res, async function (err) {
     if (err instanceof multer.MulterError) {
       // A Multer error occurred when uploading.
       res.send(err.message + "Should be less than 10mb");
@@ -119,50 +123,59 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
     }
 
     // Everything went fine.
-    return;
-  });
-  if (req.body.getOtp != undefined && req.body.register == undefined) {
-    otp.sendMail(req.body.email);
-    return;
-  }
-  if (req.body.register != undefined && req.body.getOtp == undefined) {
-    if (otp.verifyOtp(req.body.otp)) {
-      try {
-        if (
-          req.body.role == role.USER_ROLE.PATIENT ||
-          req.body.role == role.USER_ROLE.PROFESSIONAL
-        ) {
-          const salt = await bcrypt.genSalt(10);
-          const hashedPassword = await bcrypt.hash(req.body.password, salt);
-          const id = Date.now() + Math.floor(Math.random() * 100000);
-          const user = {
-            id: id,
-            name: req.body.name,
-            email: req.body.email,
-            password: hashedPassword,
-            age: req.body.age || 0,
-            role: req.body.role,
-          };
-          await db.createUser(user);
-          await db.insertPOI(id, req.file.filename, "user");
-          res.redirect("/login");
-        } else {
+
+    if (req.body.getOtp != undefined && req.body.register == undefined) {
+      fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+        if (err){
+          res.send("Oops! something went wrong!")
+        };
+        console.log("deleted for otp");
+      });
+      otp.sendMail(req.body.email);
+      return false;
+    }
+
+    if (req.body.register != undefined && req.body.getOtp == undefined) {
+      if (otp.verifyOtp(req.body.otp)) {
+        try {
+          if (
+            req.body.role == role.USER_ROLE.PATIENT ||
+            req.body.role == role.USER_ROLE.PROFESSIONAL
+          ) {
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(req.body.password, salt);
+            const id = Date.now() + Math.floor(Math.random() * 100000);
+            const user = {
+              id: id,
+              name: req.body.name,
+              email: req.body.email,
+              password: hashedPassword,
+              age: req.body.age || 0,
+              role: req.body.role,
+            };
+            await db.createUser(user);
+            await db.insertPOI(id, req.file.filename, "user");
+            res.redirect("/login");
+          } else {
+            return res.render("register.ejs", {
+              message: "Role can only be patient or professional",
+            });
+          }
+        } catch (error) {
+          console.log(error);
           return res.render("register.ejs", {
-            message: "Role can only be patient or professional",
+            message: "Something went wrong. Please try again.",
           });
         }
-      } catch (error) {
-        console.log(error);
+      } else {
         return res.render("register.ejs", {
-          message: "Something went wrong. Please try again.",
+          message: "Please enter the correct otp",
         });
       }
-    } else {
-      return res.render("register.ejs", {
-        message: "Please enter the correct otp",
-      });
     }
-  }
+  });
+  console.log("Hello");
+  console.log(req.body);
 });
 
 app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
