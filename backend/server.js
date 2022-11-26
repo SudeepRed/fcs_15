@@ -18,14 +18,19 @@ import fs from "fs";
 import zip from "express-zip";
 import * as IPFS from "ipfs-core";
 import * as logs from "logger";
-import rateLimit from 'express-rate-limit'
-
+import rateLimit from "express-rate-limit";
+import * as requestIp from "request-ip";
 let logger = logs.createLogger("Bhamlo.log");
 
 const limiter = rateLimit({
-	windowMs: 1000*60*15, // 15 minutes
-	max: 300, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
-})
+  windowMs: 1000, // 15 minutes
+  max: 1, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  keyGenerator: (req, res) => {
+    console.log(req.clientIp)
+    logger.info("IP ratelimited: "+ req.clientIp)
+    return req.clientIp; // IP address from requestIp.mw(), as opposed to req.ip
+  },
+});
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "./db/uploads");
@@ -76,7 +81,8 @@ const uploadPOI = multer({
 });
 dotenv.config();
 const app = express();
-app.use(limiter)
+app.use(requestIp.mw());
+app.use(limiter);
 app.use(express.json());
 app.use(
   express.urlencoded({
