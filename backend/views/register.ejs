@@ -1,83 +1,154 @@
-<h1>User Register</h1>
-<%= message %>
-  <form action="/registeruser" method="POST" enctype="multipart/form-data">
-    <div>
-      <label for="name">Name</label>
-      <input type="text" id="name" name="name" required />
-    </div>
-    <div>
-      <label for="email">Email</label>
-      <input type="email" id="email" name="email" required />
-    </div>
-    <div>
-      <label for="password">Password</label>
-      <input type="password" id="password" name="password" required />
-    </div>
-    <div>
-      <label for="role">Role</label>
-      <select name="role" id="role" required>
-        <option value="patient">Patient</option>
-        <option value="professional">Professional</option>
-      </select>
-    </div>
-    <div>
-      <label for="id">Add proof of identity</label>
-      <input type="file" id="updateField" name="upload" required />
-    </div>
-    <div>
-      <label for="otp">Enter OTP</label>
-      <input type="text" id="otp" name="otp" />
-    </div>
-    <button type="submit" name="getOtp">Get otp</button>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/css/index.css">
+</head>
+
+<body>
+
+
+  <h1>User Register</h1>
+  <%= message %>
+    <form action="/registeruser" method="POST" enctype="multipart/form-data">
+      <div>
+        <label for="name">Name</label>
+        <input class="input" type="text" id="default" name="name" required />
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input class="input" type="email" id="input1" name="email" required />
+      </div>
+      <div>
+        <label for="password">Password</label>
+        <input class="input" type="password" id="input2" name="password" required />
+      </div>
+      <div>
+        <label for="role">Role</label>
+        <select name="role" id="role" required>
+          <option value="patient">Patient</option>
+          <option value="professional">Professional</option>
+        </select>
+      </div>
+      <div>
+        <label for="id">Add proof of identity</label>
+        <input type="file" id="input3" name="upload" required />
+      </div>
+      <div>
+        <label for="otp">Enter OTP</label>
+        <input  class="input" type="text" name="otp" id="input4"  />
+      </div>
+      <button type="submit" name="getOtp">Get otp</button>
+
+      <button type="submit" name="register">Register</button>
+    </form>
+
+    <h1>Organization Register</h1>
+
+    <form action="/registerorg" method="POST" enctype="multipart/form-data">
+      <div>
+        <label for="name">Org Name</label>
+        <input class="input" type="text" id="input5" name="name" required />
+      </div>
+      <div>
+        <label for="role">Type of Org</label>
+        <select name="role" id="role" required>
+          <option value="hospital">hospital</option>
+          <option value="pharmacy">pharmacy</option>
+          <option value="insurance">insurance</option>
+        </select>
+      </div>
+      <div>
+        <label for="name">Work email (should be unique!)</label>
+        <input class="input" type="text" id="input6" name="domain" required />
+      </div>
+      <div>
+        <label for="name">Secret Key </label>
+        <input class="input" type="password" id="input7" name="password" required />
+      </div>
+      <div>
+        <label for="description">Description</label>
+        <input class="input" type="text" id="input8" name="description" required />
+      </div>
+      <div>
+        <label for="location">Location</label>
+        <input class="input" type="text" id="input9" name="location" required />
+      </div>
+      <div>
+        <label for="contactDetails">Contact details</label>
+        <input class="input" type="string" id="input10" name="contactDetails" required />
+      </div>
+      <div>
+        <label for="id">Add proof of identity</label>
+        <input type="file" id="input11" name="org" required multiple />
+      </div>
+      <div>
+        <label for="otp">Enter OTP</label>
+        <input  type="text" name="otp" id="input12" class="input" />
+      </div>
+      <button type="submit" name="getOtp">Get otp</button>
+      <button type="submit" name="register">Register</button>
+    </form>
     
-    <button type="submit" name="register">Register</button>
-  </form>
+    <h1><a href="/login">Login</a></h1>
+    <div class="simple-keyboard"></div>
+    <script src="https://cdn.jsdelivr.net/npm/simple-keyboard@latest/build/index.js"></script>
+    <!-- <script src="src/index.js"></script> -->
+    <script>
+      const Keyboard = window.SimpleKeyboard.default;
+      let selectedInput;
 
-  <h1>Organization Register</h1>
+      let keyboard = new Keyboard({
+        onChange: input => onChange(input),
+        onKeyPress: button => onKeyPress(button)
+      });
 
-  <form action="/registerorg" method="POST"  enctype="multipart/form-data">
-    <div>
-      <label for="name">Org Name</label>
-      <input type="text" id="name" name="name" required />
-    </div>
-    <div>
-      <label for="role">Type of Org</label>
-      <select name="role" id="role" required>
-        <option value="hospital">hospital</option>
-        <option value="pharmacy">pharmacy</option>
-        <option value="insurance">insurance</option>
-      </select>
-    </div>
-    <div>
-      <label for="name">Work email (should be unique!)</label>
-      <input type="text" id="domain" name="domain" required />
-    </div>
-    <div>
-      <label for="name">Secret Key </label>
-      <input type="password" id="password" name="password" required />
-    </div>
-    <div>
-      <label for="description">Description</label>
-      <input type="text" id="description" name="description" required />
-    </div>
-    <div>
-      <label for="location">Location</label>
-      <input type="text" id="location" name="location" required />
-    </div>
-    <div>
-      <label for="contactDetails">Contact details</label>
-      <input type="string" id="contactDetails" name="contactDetails" required />
-    </div>
-    <div>
-      <label for="id">Add proof of identity</label>
-      <input type="file" id="updateField" name="org" required multiple/>
-    </div>
-    <div>
-      <label for="otp">Enter OTP</label>
-      <input type="text" id="otp" name="otp" />
-    </div>
-    <button type="submit" name="getOtp">Get otp</button>
-    <button type="submit" name="register">Register</button>
-  </form>
+      document.querySelectorAll(".input").forEach(input => {
+        input.addEventListener("focus", onInputFocus);
+        // Optional: Use if you want to track input changes
+        // made without simple-keyboard
+        input.addEventListener("input", onInputChange);
+      });
 
-  <h1><a href="/login">Login</a></h1>
+      function onInputFocus(event) {
+        selectedInput = `#${event.target.id}`;
+
+        keyboard.setOptions({
+          inputName: event.target.id
+        });
+      }
+
+      function onInputChange(event) {
+        keyboard.setInput(event.target.value, event.target.id);
+      }
+
+      function onChange(input) {
+        console.log("Input changed", input);
+        document.querySelector(selectedInput || ".input").value = input;
+      }
+
+      function onKeyPress(button) {
+        console.log("Button pressed", button);
+
+        /**
+         * Shift functionality
+         */
+        if (button === "{lock}" || button === "{shift}") handleShiftButton();
+      }
+
+      function handleShiftButton() {
+        let currentLayout = keyboard.options.layoutName;
+        let shiftToggle = currentLayout === "default" ? "shift" : "default";
+
+        keyboard.setOptions({
+          layoutName: shiftToggle
+        });
+      }
+    </script>
+</body>
+
+</html>
