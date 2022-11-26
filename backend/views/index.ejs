@@ -220,31 +220,47 @@
 
   <div class="club">
     <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
-      <form action="/share" method="POST" enctype="multipart/form-data" style="border-right: 4px  solid; padding: 15px">
-        <div>
-          <label for="id">Choose File</label>
-          <input type="file" id="updateField" name="upload" required />
-        </div>
-        <div>
-          <label for="id">Enter id to share file</label>
-          <input type="text" id="updateField" name="rid" required />
-        </div>
-        <div>
-          <label for="type">Select Type</label>
-          <select name="type" id="type" required>
-            <option value="org">Organization</option>
-            <option value="user">User</option>
-          </select>
-        </div>
+      <% if ( typeof data.user !='undefined' ){ %>
+        <% if(data.user.role=='patient' ) {%>
+          <form action="/upload" method="POST" enctype="multipart/form-data"
+            style="border-right: 4px  solid; padding: 15px">
+            <div>
+              <label for="id">Choose File</label>
+              <input type="file" id="updateField" name="upload" required />
+            </div>
+            <div>
+            </div>
+            
 
-        <button type="submit">Share</button>
-      </form>
+              <button type="submit">Upload To Verify</button>
+          </form>
+          <% }} %>
+          <form action="/share" method="POST" enctype="multipart/form-data"
+            style="border-right: 4px  solid; padding: 15px">
+            <div>
+              <label for="id">Choose File</label>
+              <input type="file" id="updateField" name="upload" required />
+            </div>
+            <div>
+              <label for="id">Enter id to share file</label>
+              <input type="text" id="updateField" name="rid" required />
+            </div>
+            <div>
+              <label for="type">Select Type</label>
+              <select name="type" id="type" required>
+                <option value="org">Organization</option>
+                <option value="user">User</option>
+              </select>
+            </div>
 
-      <form action="/getFiles" method="GET" style="padding: 15px">
-        <button type="submit">
-          Download All Documents Shared with Me !
-        </button>
-      </form>
+            <button type="submit">Share</button>
+          </form>
+
+          <form action="/getFiles" method="GET" style="padding: 15px">
+            <button type="submit">
+              Download All Documents Shared with Me !
+            </button>
+          </form>
     </div>
   </div>
 

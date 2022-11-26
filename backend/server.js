@@ -237,43 +237,24 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
     }
   }
 });
-app.post("/passphrase", auth.checkAuth, async (req, res) => {
-  if (req.body.getOtp != undefined) {
-    const email =
-      req.session.data.user.email != undefined
-        ? req.session.data.user.email
-        : req.session.data.user.domain;
-    otp.sendMail(email);
-    return;
-  }
-  if (req.body.otp != undefined && req.body.pass != undefined) {
-    if (otp.verifyOtp(req.body.otp)) {
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(req.body.pass, salt);
-      try {
-        const result = await db.updatePassphrase(
-          hashedPassword,
-          req.session.data.user.type,
-          req.session.data.user.id
-        );
-        res.send("Successfully updated passphrase");
-      } catch (error) {
-        console.log(error);
-        logger.error(error);
-      }
-    } else {
-      res.send("Enter correct otp");
-    }
-  } else {
-    res.send("enter otp/passphrase");
-  }
-});
+
 app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
   try {
     const type = req.session.data.user.type;
     const myFiles = await db.getMyfiles(type, req.session.data.user.id);
-
-    res.json(myFiles);
+    let files = [];
+    const dir = "./db/uploads/";
+    myFiles.forEach((file) => {
+      if (fs.existsSync(dir + file.filename)) {
+        files.push({
+          name: file.filename,
+        });
+      }
+    });
+    if (files.length == 0) {
+      return res.send("Oops! Seems like there are no documents");
+    }
+    return res.json(files);
   } catch (error) {
     console.log(error);
     logger.error(error);
@@ -287,14 +268,19 @@ app.post("/download", auth.checkAuth, async (req, res) => {
     let files = [];
     const dir = "./db/uploads/";
     myFiles.forEach((file) => {
-      files.push({
-        path: dir + file.filename,
-        name: file.filename,
-      });
+      if (fs.existsSync(dir + file.filename)) {
+        files.push({
+          path: dir + file.filename,
+          name: file.filename,
+        });
+      }
     });
+    if (files.length == 0) {
+      return res.send("Oops! Seems like there are no documents");
+    }
     const zipFilename =
-      "Bhamlo_" + req.session.data.user.id.toString() + ".zip";
-    res.zip(files, zipFilename);
+      "Bhamlo_My_Files_" + req.session.data.user.name.toString() + ".zip";
+    return res.zip(files, zipFilename);
   } catch (error) {
     console.log(error);
     logger.error(error);
@@ -313,7 +299,7 @@ app.post(
         const dir = "./db/uploads/" + req.body.name;
         fs.unlinkSync(dir);
       }
-      res.send("deleted");
+      return res.send("deleted");
     } catch (e) {
       console.log("e");
       logger.error(e);
@@ -396,16 +382,50 @@ app.get(
       let files = [];
       const dir = "./db/uploads/";
       sharedFiles.forEach((file) => {
-        files.push({
-          path: dir + file.filename,
-          name: file.filename,
-        });
+        if (fs.existsSync(dir + file.filename)) {
+          files.push({
+            path: dir + file.filename,
+            name: file.filename,
+          });
+        }
       });
-
-      return res.zip(files);
+      if (files.length == 0) {
+        return res.send("Oops! Seems like there are no documents");
+      }
+      const zipFilename =
+        "Bhamlo_Shared_Files_" + req.session.data.user.name.toString() + ".zip";
+      return res.zip(files, zipFilename);
     } catch (e) {
       console.log(e);
       logger.error(e);
+    }
+  }
+);
+app.post(
+  "/upload",
+  auth.checkAuth,
+  roleAuth.roleCheck([role.USER_ROLE.PATIENT]),
+  uploadAndVerify.single("upload"),
+  async (req, res) => {
+    try {
+      let hash = "NA";
+      const ipfs = await IPFS.create();
+      const data = fs.readFileSync("./db/uploads/" + req.file.filename);
+      hash = await ipfs.add(data);
+      const ipfsStop = await ipfs.stop();
+
+      let result = await db.insertFile(
+        req.session.data.user.type,
+        req.session.data.user.id,
+        req.file.filename,
+        hash.path
+      );
+
+      return res.json({ status: "success" });
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      return res.json({ error: "An error Occured" });
     }
   }
 );
