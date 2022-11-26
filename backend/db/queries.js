@@ -7,8 +7,9 @@ export async function createUser(user) {
         INSERT INTO USERS (id, name, email, password, age, role) VALUES ($1, $2 , $3, $4, $5, $6);`,
       [user.id, user.name, user.email, user.password, user.age, user.role]
     );
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function updateUser(user) {
@@ -35,6 +36,7 @@ export async function updateUser(user) {
     );
   } catch (err) {
     console.log(err);
+    logger.error(err);
   }
 }
 export async function getUserbyEmail(email) {
@@ -43,8 +45,9 @@ export async function getUserbyEmail(email) {
       email,
     ]);
     return result.rows[0];
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -54,8 +57,9 @@ export async function getUserbyId(id) {
       id,
     ]);
     return result.rows[0];
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -76,8 +80,9 @@ export async function createOrg(user) {
         user.contactDetails,
       ]
     );
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 
@@ -87,8 +92,9 @@ export async function getOrgbyDomain(domain) {
       domain,
     ]);
     return result.rows[0];
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -97,8 +103,9 @@ export async function getOrgs() {
   try {
     const result = await client.query(`SELECT * FROM ORGS`);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -109,8 +116,9 @@ export async function getUsersByRole(role) {
       role,
     ]);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -120,8 +128,9 @@ export async function getOrgsByRole(role) {
       role,
     ]);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -132,8 +141,9 @@ export async function getApplications(type) {
         `SELECT * FROM USERS WHERE status = 'pending';`
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   } else if (type == "org") {
@@ -142,8 +152,9 @@ export async function getApplications(type) {
         `SELECT * FROM ORGS WHERE status = 'pending';`
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -156,8 +167,9 @@ export async function approveApplication(id, type) {
         [id]
       );
       return;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   } else if (type == "org") {
@@ -167,8 +179,9 @@ export async function approveApplication(id, type) {
         [id]
       );
       return;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -181,8 +194,9 @@ export async function insertFile(type, id, filename, hash) {
         [id, filename, hash]
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -193,8 +207,9 @@ export async function insertFile(type, id, filename, hash) {
         [id, filename]
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -207,8 +222,9 @@ export async function updatePassphrase(pass, type, id) {
         [pass, id]
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -219,8 +235,9 @@ export async function updatePassphrase(pass, type, id) {
         [pass, id]
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -233,8 +250,9 @@ export async function getPassphrase(type, id) {
         [id]
       );
       return result.rows[0];
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -245,8 +263,9 @@ export async function getPassphrase(type, id) {
         [id]
       );
       return result.rows[0];
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -262,8 +281,9 @@ export async function shareFile(Stype, Rtype, sid, rid, filename, hash) {
         [sid, rid, filename, hash]
       );
       return result;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -275,8 +295,9 @@ export async function getFiles(rid) {
       [rid]
     );
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
@@ -288,8 +309,9 @@ export async function getMyfiles(type, id) {
         [id]
       );
       return result.rows;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
 }
@@ -302,8 +324,9 @@ export async function deleteMyFile(type, name) {
       );
 
       return { status: "done" };
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return { status: "failed" };
     }
 }
@@ -312,8 +335,9 @@ export async function getUsers() {
   try {
     const result = await client.query(`SELECT id, name, email FROM USERS;`);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return { status: "failed" };
   }
 }
@@ -321,8 +345,9 @@ export async function getOgs() {
   try {
     const result = await client.query(`SELECT id, name, domain FROM ORGS;`);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return { status: "failed" };
   }
 }
@@ -335,8 +360,9 @@ export async function deleteEntity(type, id) {
         [id]
       );
       return result;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -344,8 +370,9 @@ export async function deleteEntity(type, id) {
     try {
       const result = await client.query(`DELETE FROM ORGS WHERE id= $1;`, [id]);
       return result;
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       return null;
     }
   }
@@ -354,8 +381,9 @@ export async function getDrugs() {
   try {
     const result = await client.query(`SELECT * FROM DRUGS;`);
     return result.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function buyDrug(did, uid, wallet) {
@@ -378,19 +406,22 @@ export async function buyDrug(did, uid, wallet) {
       ]
     );
     return { status: "Successful" };
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function showClaims(vid) {
   try {
-    const data = await client.query(`SELECT * FROM CLAIMS WHERE vid = $1 and status = 'pending';`, [
-      vid,
-    ]);
+    const data = await client.query(
+      `SELECT * FROM CLAIMS WHERE vid = $1 and status = 'pending';`,
+      [vid]
+    );
 
     return data.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function refundAmount(time) {
@@ -401,31 +432,48 @@ export async function refundAmount(time) {
 
     const cost = data.rows[0].amount;
 
-    const wallet = await client.query(`SELECT * FROM USERS WHERE id = $1;`, [ data.rows[0].bid]);
+    const wallet = await client.query(`SELECT * FROM USERS WHERE id = $1;`, [
+      data.rows[0].bid,
+    ]);
 
-    const updatedWallet = wallet.rows[0].wallet+cost;
+    const updatedWallet = wallet.rows[0].wallet + cost;
 
-    const updateUser = await client.query(`UPDATE USERS SET WALLET = $1 WHERE id = $2;`, [ updatedWallet, data.rows[0].bid]);
-    const updatedClaim = await client.query(`UPDATE CLAIMS SET status = 'approved' WHERE time = $1;`, [time]);
+    const updateUser = await client.query(
+      `UPDATE USERS SET WALLET = $1 WHERE id = $2;`,
+      [updatedWallet, data.rows[0].bid]
+    );
+    const updatedClaim = await client.query(
+      `UPDATE CLAIMS SET status = 'approved' WHERE time = $1;`,
+      [time]
+    );
 
     return data.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function insertPOI(id, filename, type) {
   try {
-    await client.query(`INSERT INTO POI VALUES ($1, $2, $3)`,[id, filename, type]);
-  } catch (e) {
-    console.log(e);
+    await client.query(`INSERT INTO POI VALUES ($1, $2, $3)`, [
+      id,
+      filename,
+      type,
+    ]);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function getPOI(id) {
   try {
-    const res = await client.query(`SELECT filename from POI WHERE id = $1`,[id]);
+    const res = await client.query(`SELECT filename from POI WHERE id = $1`, [
+      id,
+    ]);
     return res.rows;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
 }
 export async function verifyHash(hash) {
@@ -434,11 +482,10 @@ export async function verifyHash(hash) {
       `select hash from user_files where hash = $1`,
       [hash]
     );
-    console.log(result);
     return result.rows.length > 0;
-  } catch (e) {
-    console.log(e);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return null;
   }
 }
-

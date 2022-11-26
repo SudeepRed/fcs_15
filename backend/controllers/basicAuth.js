@@ -22,7 +22,7 @@ export async function validateUser(req, res, next) {
         .status(403)
         .json({ message: "Invalid Password for the given Email/Domain" });
     }
-  } catch (e) {
+  } catch (err) {
     return res.status(403).json({ message: e });
   }
 }
@@ -50,6 +50,7 @@ export async function verifyFile(req) {
     return ret;
   } catch (err) {
     console.log(err);
+    logger.error(err);
     return false;
   }
 }

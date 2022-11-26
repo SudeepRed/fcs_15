@@ -125,10 +125,12 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
       res.send(err.message + "Should be less than 10mb");
       console.log(err);
       logger.error(err);
+      logger.error(err);
     } else if (err) {
       // An unknown error occurred when uploading.
       res.send("An unknown error occurred");
       console.log(err);
+      logger.error(err);
       logger.error(err);
     }
 
@@ -172,8 +174,9 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
               message: "Role can only be patient or professional",
             });
           }
-        } catch (error) {
-          console.log(error);
+        } catch (err) {
+          console.log(err);
+          logger.error(err);
           logger.error(error);
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
@@ -223,8 +226,9 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
             });
           }
         }
-      } catch (error) {
-        console.log(error);
+      } catch (err) {
+        console.log(err);
+        logger.error(err);
         logger.error(error);
         return res.render("register.ejs", {
           message: "Something went wrong. Please try again.",
@@ -255,8 +259,9 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
       return res.send("Oops! Seems like there are no documents");
     }
     return res.json(files);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     logger.error(error);
     res.send("failed to get myfiles");
   }
@@ -281,8 +286,9 @@ app.post("/download", auth.checkAuth, async (req, res) => {
     const zipFilename =
       "Bhamlo_My_Files_" + req.session.data.user.name.toString() + ".zip";
     return res.zip(files, zipFilename);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     logger.error(error);
     res.send("failed to get myfiles");
   }
@@ -300,7 +306,7 @@ app.post(
         fs.unlinkSync(dir);
       }
       return res.send("deleted");
-    } catch (e) {
+    } catch (err) {
       console.log("e");
       logger.error(e);
     }
@@ -361,6 +367,7 @@ app.post(
     } catch (err) {
       console.log(err);
       logger.error(err);
+      logger.error(err);
       return res.json({ error: "An error Occured" });
     }
   }
@@ -395,8 +402,9 @@ app.get(
       const zipFilename =
         "Bhamlo_Shared_Files_" + req.session.data.user.name.toString() + ".zip";
       return res.zip(files, zipFilename);
-    } catch (e) {
-      console.log(e);
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
       logger.error(e);
     }
   }
@@ -424,6 +432,7 @@ app.post(
       return res.json({ status: "success" });
     } catch (err) {
       console.log(err);
+      logger.error(err);
       logger.error(err);
       return res.json({ error: "An error Occured" });
     }

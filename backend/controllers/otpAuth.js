@@ -20,7 +20,6 @@ function genrateOtp() {
 }
 
 export async function sendMail(email) {
-  console.log("Here")
   const otp = genrateOtp();
   try {
     let info = await transporter.sendMail({
@@ -38,8 +37,9 @@ export async function sendMail(email) {
       `,
     });
     return info;
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     return false;
   }
 }
@@ -55,7 +55,7 @@ export function verifyOtp(otp) {
       } else {
         return false;
       }
-    } catch (e) {
+    } catch (err) {
       return false;
     }
   } else {

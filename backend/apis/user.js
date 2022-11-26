@@ -30,6 +30,7 @@ router.post(
       return res.redirect("/");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -45,6 +46,7 @@ router.get(
       return res.redirect("/");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -58,6 +60,7 @@ router.get(
       return res.redirect("/");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -72,6 +75,7 @@ router.get(
       return res.redirect("/");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -80,11 +84,16 @@ router.post(
   roleCheck([roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {
-      const data = await db.buyDrug(req.body.id, req.session.data.user.id, req.session.data.user.wallet);
-      return res.send(data)
+      const data = await db.buyDrug(
+        req.body.id,
+        req.session.data.user.id,
+        req.session.data.user.wallet
+      );
+      return res.send(data);
       // return res.redirect("/");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -98,6 +107,7 @@ router.get(
       return res.send(data);
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
@@ -107,11 +117,10 @@ router.post(
   async (req, res) => {
     try {
       const data = await db.refundAmount(req.body.id);
-      return res.send("done")
+      return res.send("done");
     } catch (err) {
       console.log(err);
+      logger.error(err);
     }
   }
 );
-
-

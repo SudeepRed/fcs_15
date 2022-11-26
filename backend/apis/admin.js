@@ -14,6 +14,7 @@ router.get("/getapplications", async (req, res) => {
     return res.redirect("/");
   } catch (err) {
     console.log(err);
+    logger.error(err);
   }
 });
 router.post("/approve", async (req, res) => {
@@ -22,6 +23,7 @@ router.post("/approve", async (req, res) => {
     return res.redirect("/");
   } catch (err) {
     console.log(err);
+    logger.error(err);
   }
 });
 router.get("/showall", async (req, res) => {
@@ -36,6 +38,7 @@ router.get("/showall", async (req, res) => {
     return res.redirect("/");
   } catch (err) {
     console.log(err);
+    logger.error(err);
   }
 });
 
@@ -45,6 +48,7 @@ router.post("/delete", async (req, res) => {
     return res.redirect("/");
   } catch (err) {
     console.log(err);
+    logger.error(err);
   }
 });
 router.post("/download", async (req, res) => {
@@ -53,7 +57,6 @@ router.post("/download", async (req, res) => {
     let files = [];
     const dir = "./db/uploads/";
     myFiles.forEach((file) => {
-      console.log(dir + file.filename);
       if (fs.existsSync(dir + file.filename)) {
         files.push({
           path: dir + file.filename,
@@ -66,8 +69,9 @@ router.post("/download", async (req, res) => {
     }
     let zipFilename = req.body.id.toString() + ".zip";
     res.zip(files, zipFilename);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
     res.send("failed to get POI");
   }
 });

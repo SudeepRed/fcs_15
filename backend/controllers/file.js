@@ -45,22 +45,22 @@ const uploadPOI = multer({
   },
 });
 
-
-
 export function uploadFile(req, res, next) {
-    const checkPOI = uploadPOI.single('upload');
+  const checkPOI = uploadPOI.single("upload");
 
-    checkPOI(req, res, function (err) {
-        if (err instanceof multer.MulterError) {
-            // A Multer error occurred when uploading.
-            console.log(err)
-        } else if (err) {
-            // An unknown error occurred when uploading.
-            console.log(err)
-        }
-        // Everything went fine. 
-        console.log(req)
-        res.locals.file = req.file;
-        next()
-    })
+  checkPOI(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+      // A Multer error occurred when uploading.
+      console.log(err);
+      logger.error(err);
+    } else if (err) {
+      // An unknown error occurred when uploading.
+      console.log(err);
+      logger.error(err);
+    }
+    // Everything went fine.
+    console.log(req);
+    res.locals.file = req.file;
+    next();
+  });
 }

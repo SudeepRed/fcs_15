@@ -20,8 +20,9 @@ export async function createDB() {
     );
 
         `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -36,8 +37,9 @@ export async function createDB() {
       contactDetails text DEFAULT '',
       pass varchar(100)
     );`);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -51,8 +53,9 @@ export async function createDB() {
     ALTER COLUMN ROLE TYPE USER_ROLE USING (ROLE::USER_ROLE);
     ALTER TABLE ORGS
     ALTER COLUMN ROLE TYPE ORG_ROLE USING (ROLE::ORG_ROLE);`);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -63,15 +66,17 @@ export async function createDB() {
     END $$;
     ALTER TABLE USERS
     ADD IF NOT EXISTS status STATUS DEFAULT 'pending';`);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
     ALTER TABLE ORGS
     ADD IF NOT EXISTS status STATUS DEFAULT 'pending' ;`);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -96,8 +101,9 @@ export async function createDB() {
         ON DELETE CASCADE
     );
     `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -116,8 +122,9 @@ export async function createDB() {
       
     )
     `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -128,8 +135,9 @@ export async function createDB() {
       vid bigint NOT NULL
     );
     `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -152,8 +160,9 @@ export async function createDB() {
       
     );
     `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   try {
     await client.query(`
@@ -165,8 +174,9 @@ export async function createDB() {
       )
 
     `);
-  } catch (error) {
-    console.log(error);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
   }
   //END
 }
