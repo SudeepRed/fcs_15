@@ -17,6 +17,9 @@ import path from "path";
 import fs from "fs";
 import zip from "express-zip";
 import * as IPFS from "ipfs-core";
+import * as logs from "logger";
+
+let logger = logs.createLogger("Bhamlo.log");
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -31,17 +34,21 @@ const storage = multer.diskStorage({
     cb(null, filename);
   },
 });
-const uploadDoc = multer({
+const uploadAndVerify = multer({
   storage: storage,
-  limits: { fileSize: 10 },
-  fileFilter: async function (req, file, cb) {
-    const ret = await auth.verifyFile(req);
-    if (ret == true) {
-      req.fileError = false;
+  limits: { fileSize: 1e7 },
+  fileFilter: (req, file, cb) => {
+    if (
+      file.mimetype == "image/png" ||
+      file.mimetype == "image/jpg" ||
+      file.mimetype == "image/jpeg" ||
+      file.mimetype === "application/pdf"
+    ) {
+      cb(null, true);
     } else {
-      req.fileError = true;
+      cb(null, false);
+      return cb("Only .png, .jpg and .jpeg format allowed!");
     }
-    cb(null, ret);
   },
 });
 const FILE_SIZE = 1 * 1024 * 1024;
@@ -54,7 +61,8 @@ const uploadPOI = multer({
     if (
       file.mimetype == "image/png" ||
       file.mimetype == "image/jpg" ||
-      file.mimetype == "image/jpeg"
+      file.mimetype == "image/jpeg" ||
+      file.mimetype === "application/pdf"
     ) {
       cb(null, true);
     } else {
@@ -116,10 +124,12 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
       // A Multer error occurred when uploading.
       res.send(err.message + "Should be less than 10mb");
       console.log(err);
+      logger.error(err);
     } else if (err) {
       // An unknown error occurred when uploading.
       res.send("An unknown error occurred");
       console.log(err);
+      logger.error(err);
     }
 
     // Everything went fine.
@@ -130,6 +140,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
           res.send("Oops! something went wrong!");
         }
         console.log("deleted for otp");
+        logger.info("Uploaded File deleted for otp");
       });
       otp.sendMail(req.body.email);
       return false;
@@ -163,6 +174,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
           }
         } catch (error) {
           console.log(error);
+          logger.error(error);
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
           });
@@ -174,8 +186,6 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
       }
     }
   });
-  console.log("Hello");
-  console.log(req.body);
 });
 
 app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
@@ -215,6 +225,7 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
         }
       } catch (error) {
         console.log(error);
+        logger.error(error);
         return res.render("register.ejs", {
           message: "Something went wrong. Please try again.",
         });
@@ -248,6 +259,7 @@ app.post("/passphrase", auth.checkAuth, async (req, res) => {
         res.send("Successfully updated passphrase");
       } catch (error) {
         console.log(error);
+        logger.error(error);
       }
     } else {
       res.send("Enter correct otp");
@@ -264,6 +276,7 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
     res.json(myFiles);
   } catch (error) {
     console.log(error);
+    logger.error(error);
     res.send("failed to get myfiles");
   }
 });
@@ -284,6 +297,7 @@ app.post("/download", auth.checkAuth, async (req, res) => {
     res.zip(files, zipFilename);
   } catch (error) {
     console.log(error);
+    logger.error(error);
     res.send("failed to get myfiles");
   }
 });
@@ -302,21 +316,40 @@ app.post(
       res.send("deleted");
     } catch (e) {
       console.log("e");
+      logger.error(e);
     }
   }
 );
 app.post(
-  "/upload",
+  "/share",
   auth.checkAuth,
-  uploadPOI.single("upload"),
+  uploadAndVerify.single("upload"),
   async (req, res) => {
     try {
+      if (req.session.data.user.role == "patient") {
+        let hash = "NA";
+        const ipfs = await IPFS.create();
+        const data = fs.readFileSync("./db/uploads/" + req.file.filename);
+        hash = await ipfs.add(data);
+        const resStop = await ipfs.stop();
+        console.log(resStop);
+        const verify = await db.verifyHash(hash.path);
+        if (!verify) {
+          fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+            if (err) {
+              res.send("Oops! something went wrong!");
+            }
+            console.log("Deleted Un-Verified File");
+            logger.info("Deleted Un-Verified File");
+          });
+          return res.send("You have attempted to upload an unverified file!");
+        }
+      }
       let hash = "NA";
-
       const ipfs = await IPFS.create();
       const data = fs.readFileSync("./db/uploads/" + req.file.filename);
       hash = await ipfs.add(data);
-      ipfs.stop();
+      const ipfsStop = await ipfs.stop();
 
       let result = await db.insertFile(
         req.session.data.user.type,
@@ -340,7 +373,9 @@ app.post(
       }
       return res.json({ status: "success" });
     } catch (err) {
-      return res.json({ error: err });
+      console.log(err);
+      logger.error(err);
+      return res.json({ error: "An error Occured" });
     }
   }
 );
@@ -366,9 +401,11 @@ app.get(
           name: file.filename,
         });
       });
+
       return res.zip(files);
     } catch (e) {
       console.log(e);
+      logger.error(e);
     }
   }
 );
@@ -379,6 +416,7 @@ app.post("/logout", auth.checkAuth, (req, res) => {
 });
 app.listen(process.env.PORT, () => {
   console.log("Server Started");
+  logger.info("Server Started");
 });
 
 createDB();

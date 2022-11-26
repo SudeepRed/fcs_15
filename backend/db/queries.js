@@ -428,4 +428,17 @@ export async function getPOI(id) {
     console.log(e);
   }
 }
+export async function verifyHash(hash) {
+  try {
+    const result = await client.query(
+      `select hash from user_files where hash = $1`,
+      [hash]
+    );
+    console.log(result);
+    return result.rows.length > 0;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
+}
 

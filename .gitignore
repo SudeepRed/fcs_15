@@ -3,6 +3,7 @@
 # dependencies
 frontend/node_modules
 backend/node_modules
+backend/Bhamlo.log
 backend/.env
 backend/db/uploads/**
 /.pnp
