@@ -10,9 +10,6 @@
 </head>
 
 <body>
-  <form action="/logout" method="POST">
-    <button type="submit">Log Out</button>
-  </form>
   <div>
     <% if ( typeof data.user !='undefined' ){ %>
       <h1>Hello <b>
@@ -44,232 +41,231 @@
       </p>
       <% } %>
   </div>
-
-  <div style="display:flex; flex-direction: row;">
-    <div>
-      <% if ( typeof data.orgs !='undefined' ){ %>
-        <% data.orgs.forEach(function(org) { %>
-          <p>
-            <%= org.name %>
-          </p>
-          <% }) %>
-            <% } %>
-              <form action="/user/getorgs" method="GET">
-                <button type="submit">Get orgs</button>
-              </form>
-    </div>
-    <div>
-      <% if ( typeof data.professionals !='undefined' ){ %>
-        <% data.professionals.forEach(function(professionals) { %>
-          <p>
-            <%= professionals.id %>
-              <%= professionals.name %>
-                <%= professionals.role %>
-          </p>
-          <% }) %>
-            <% } %>
-              <form action="/user/getprofessionals" method="GET">
-                <button type="submit">Get professionals</button>
-              </form>
+  <div class="club">
+    <div style="display:flex; flex-direction: row;">
+      <div>
+        <% if ( typeof data.orgs !='undefined' ){ %>
+          <% data.orgs.forEach(function(org) { %>
+            <p>
+              <%= org.name %>
+            </p>
+            <% }) %>
+              <% } %>
+                <form action="/user/getorgs" method="GET">
+                  <button type="submit">Get orgs</button>
+                </form>
+      </div>
+      <div>
+        <% if ( typeof data.professionals !='undefined' ){ %>
+          <% data.professionals.forEach(function(professionals) { %>
+            <p>
+              <%= professionals.id %>
+                <%= professionals.name %>
+                  <%= professionals.role %>
+            </p>
+            <% }) %>
+              <% } %>
+                <form action="/user/getprofessionals" method="GET">
+                  <button type="submit">Get professionals</button>
+                </form>
+      </div>
     </div>
   </div>
 
 
+  <div class="club">
+    <form action="/user/editprofile" method="POST">
+      <div>
+        <label for="name">Name</label>
+        <input type="text" id="updateField" name="name" />
+      </div>
+      <div>
+        <label>Age</label>
+        <input type="number" id="updateField" name="age" />
+      </div>
+      <div>
+        <label>Height</label>
+        <input type="number" id="updateField" name="height" />
+      </div>
+      <div>
+        <label>Weight</label>
+        <input type="number" id="updateField" name="weight" />
+      </div>
+      <div>
+        <label>Address</label>
+        <input type="text" id="updateField" name="address" />
+      </div>
+      <div>
+        <label>Allergies</label>
+        <input type="text" id="updateField" name="allergies" />
+      </div>
+      <button type="submit">UpdateProfile</button>
+    </form>
+  </div>
 
-  <form action="/user/editprofile" method="POST">
-    <div>
-      <label for="name">Name</label>
-      <input type="text" id="updateField" name="name" />
-    </div>
-    <div>
-      <label>age</label>
-      <input type="number" id="updateField" name="age" />
-    </div>
-    <div>
-      <label>height</label>
-      <input type="number" id="updateField" name="height" />
-    </div>
-    <div>
-      <label>weight</label>
-      <input type="number" id="updateField" name="weight" />
-    </div>
-    <div>
-      <label>address</label>
-      <input type="text" id="updateField" name="address" />
-    </div>
-    <div>
-      <label>allergies</label>
-      <input type="text" id="updateField" name="allergies" />
-    </div>
-    <button type="submit">UpdateProfile</button>
-  </form>
+  <div class="club">
+    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+      <% if ( typeof data.user !='undefined' ){ %>
+        <% if(data.user.role=='admin' ) {%>
 
-
-  <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
-    <% if ( typeof data.user !='undefined' ){ %>
-      <% if(data.user.role=='admin' ) {%>
-        <div>
           <form action="/admin/showall" method="GET">
             <button type="submit">
               <h3>See all Entities</h3>
             </button>
           </form>
+
+          <form action="/admin/getapplications" method="GET">
+            <button type="submit" name="type" value="user">
+              <h3>See all Pending User Applications</h3>
+            </button>
+          </form>
+          <form action="/admin/getapplications" method="GET">
+            <button type="submit" name="type" value="org">
+              <h3>See all Pending Org Applications</h3>
+            </button>
+          </form>
+
+
+
+          <% }} %>
+    </div>
+
+
+    <div>
+      <% if ( typeof data.applications !='undefined' && data.applications.length> 0 ){ %>
+        <h3>Pending Applications</h3>
+        <% data.applications.forEach(function(application) { %>
+
+          <p>
+            <%= application.id %>
+              <%= application.name %>
+                <%= application.role %>
+
+          </p>
+
+          <% }) %>
+            <% } %>
+              <% if ( typeof data.all !='undefined' ){ %>
+                <h3>All Entities</h3>
+                <% data.all.users.forEach(function(application) { %>
+
+                  <p>
+                    <%= application.id %>
+                      <%= application.name %>
+                        <%= application.email %>
+                  </p>
+
+                  <% }) %>
+                    <% data.all.orgs.forEach(function(application) { %>
+
+                      <p>
+                        <%= application.id %>
+                          <%= application.name %>
+                            <%= application.domain %>
+                      </p>
+
+                      <% }) %>
+
+                        <% } %>
+
+    </div>
+
+    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+      <% if ( typeof data.user !='undefined' ){ %>
+        <% if(data.user.role=='admin' ) {%>
+          <form action="/admin/download" method="POST" style="border-right: 4px  solid; padding: 15px">
+            <div>
+              <label for="id">Enter application ID</label>
+              <input type="number" id="updateField" name="id" />
+            </div>
+            <button type="submit">
+              <p>Download POI Documents</p>
+            </button>
+          </form>
+          <form action="/admin/approve" method="POST" style="border-right: 4px  solid; padding: 15px">
+            <div>
+              <label for="id">Enter application ID</label>
+              <input type="number" id="updateField" name="id" />
+            </div>
+            <div>
+              <label for="type">Select Type</label>
+              <select name="type" id="type" required>
+                <option value="org">Organization</option>
+                <option value="user">User</option>
+              </select>
+            </div>
+            <button type="submit">
+              <p>Approve</p>
+            </button>
+          </form>
+          <form action="/admin/delete" method="POST">
+            <div>
+              <label for="id">Enter application ID</label>
+              <input type="number" id="updateField" name="id" />
+            </div>
+            <div>
+              <label for="type">Select Type</label>
+              <select name="type" id="type" required>
+                <option value="org">Organization</option>
+                <option value="user">User</option>
+              </select>
+            </div>
+            <button type="submit">
+              <p>Delete Entity</p>
+            </button>
+          </form>
+          <% }} %>
+    </div>
+  </div>
+
+  <div class="club">
+    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+      <form action="/share" method="POST" enctype="multipart/form-data" style="border-right: 4px  solid; padding: 15px">
+        <div>
+          <label for="id">Choose File</label>
+          <input type="file" id="updateField" name="upload" required />
         </div>
-        <form action="/admin/getapplications" method="GET">
-          <button type="submit" name="type" value="user">
-            <h3>See all Pending User Applications</h3>
-          </button>
-        </form>
-        <form action="/admin/getapplications" method="GET">
-          <button type="submit" name="type" value="org">
-            <h3>See all Pending Org Applications</h3>
-          </button>
-        </form>
+        <div>
+          <label for="id">Enter id to share file</label>
+          <input type="text" id="updateField" name="rid" required />
+        </div>
+        <div>
+          <label for="type">Select Type</label>
+          <select name="type" id="type" required>
+            <option value="org">Organization</option>
+            <option value="user">User</option>
+          </select>
+        </div>
 
+        <button type="submit">Share</button>
+      </form>
 
-
-        <% }} %>
+      <form action="/getFiles" method="GET" style="padding: 15px">
+        <button type="submit">
+          Download All Documents Shared with Me !
+        </button>
+      </form>
+    </div>
   </div>
 
+  <div class="club">
+    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+      <form action="/getMyFiles" method="GET" style="border-right: 4px  solid; padding: 15px">
+        <button type="submit">Get My Files</button>
+      </form>
+      <form action="/deletefile" method="POST" style="border-right: 4px  solid; padding: 15px;">
+        <div>
+          <label for="id">Enter file name to be deleted</label>
+          <input type="text" id="updateField" name="name" required />
+        </div>
+        <button type="submit">Delete My Files</button>
+      </form>
 
-  <div>
-    <% if ( typeof data.applications !='undefined' && data.applications.length> 0 ){ %>
-      <h3>Pending Applications</h3>
-      <% data.applications.forEach(function(application) { %>
+      <form action="/download" method="POST" style="padding: 15px">
+        <button type="submit">Download My Files</button>
+      </form>
 
-        <p>
-          <%= application.id %>
-            <%= application.name %>
-              <%= application.role %>
-
-        </p>
-
-        <% }) %>
-          <% } %>
-            <% if ( typeof data.all !='undefined' ){ %>
-              <h3>All Entities</h3>
-              <% data.all.users.forEach(function(application) { %>
-
-                <p>
-                  <%= application.id %>
-                    <%= application.name %>
-                      <%= application.email %>
-                </p>
-
-                <% }) %>
-                  <% data.all.orgs.forEach(function(application) { %>
-
-                    <p>
-                      <%= application.id %>
-                        <%= application.name %>
-                          <%= application.domain %>
-                    </p>
-
-                    <% }) %>
-
-                      <% } %>
-
-  </div>
-
-  <div>
-    <% if ( typeof data.user !='undefined' ){ %>
-      <% if(data.user.role=='admin' ) {%>
-        <form action="/admin/download" method="POST">
-          <div>
-            <label for="id">Enter application ID</label>
-            <input type="number" id="updateField" name="id" />
-          </div>
-          <button type="submit">
-            <h3>Download POI Documents</h3>
-          </button>
-        </form>
-        <form action="/admin/approve" method="POST">
-          <div>
-            <label for="id">Enter application ID</label>
-            <input type="number" id="updateField" name="id" />
-          </div>
-          <div>
-            <label for="type">Select Type</label>
-            <select name="type" id="type" required>
-              <option value="org">Organization</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-          <button type="submit">
-            <h3>Approve</h3>
-          </button>
-        </form>
-        <form action="/admin/delete" method="POST">
-          <div>
-            <label for="id">Enter application ID</label>
-            <input type="number" id="updateField" name="id" />
-          </div>
-          <div>
-            <label for="type">Select Type</label>
-            <select name="type" id="type" required>
-              <option value="org">Organization</option>
-              <option value="user">User</option>
-            </select>
-          </div>
-          <button type="submit">
-            <h3>Delete Entity</h3>
-          </button>
-        </form>
-        <% }} %>
-  </div>
-  <form action="/passphrase" method="POST">
-    <div>
-      <label for="id">Enter a passphrase for file upload verification</label>
-      <input type="password" id="updateField" name="pass" required />
     </div>
-    <div>
-      <label for="otp">Enter OTP</label>
-      <input type="text" id="otp" name="otp" />
-    </div>
-    <button type="submit" name="getOtp">Get otp</button>
-    <button type="submit">Add passphrase</button>
-  </form>
-
-  <form action="/share" method="POST" enctype="multipart/form-data">
-    <div>
-      <label for="id">Choose File</label>
-      <input type="file" id="updateField" name="upload" required />
-    </div>
-    <div>
-      <label for="id">Enter id to share file</label>
-      <input type="text" id="updateField" name="rid" required />
-    </div>
-    <div>
-      <label for="type">Select Type</label>
-      <select name="type" id="type" required>
-        <option value="org">Organization</option>
-        <option value="user">User</option>
-      </select>
-    </div>
-
-    <button type="submit">Share</button>
-  </form>
-
-  <form action="/getFiles" method="GET">
-    <button type="submit">
-      Download All Documents Shared with Me !
-    </button>
-  </form>
-  <div>
-    <form action="/getMyFiles" method="GET">
-      <button type="submit">Get My Files</button>
-    </form>
-
-    <form action="/download" method="POST">
-      <button type="submit">Download My Files</button>
-    </form>
-    <form action="/deletefile" method="POST">
-      <div>
-        <label for="id">Enter file name to be deleted</label>
-        <input type="text" id="updateField" name="name" required />
-      </div>
-      <button type="submit">Delete My Files</button>
-    </form>
   </div>
   <div>
     <% if ( typeof data.drugs !='undefined' ){ %>
