@@ -23,8 +23,8 @@ import * as requestIp from "request-ip";
 let logger = logs.createLogger("Bhamlo.log");
 
 const limiter = rateLimit({
-  windowMs: 1000, // 15 minutes
-  max: 1, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
+  windowMs: 1000*60*15, // 15 minutes
+  max: 300, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   keyGenerator: (req, res) => {
     console.log(req.clientIp)
     logger.info("IP ratelimited: "+ req.clientIp)
