@@ -126,9 +126,9 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
 
     if (req.body.getOtp != undefined && req.body.register == undefined) {
       fs.unlink("./db/uploads/" + req.file.filename, (err) => {
-        if (err){
-          res.send("Oops! something went wrong!")
-        };
+        if (err) {
+          res.send("Oops! something went wrong!");
+        }
         console.log("deleted for otp");
       });
       otp.sendMail(req.body.email);
@@ -308,16 +308,21 @@ app.post(
 app.post(
   "/upload",
   auth.checkAuth,
-  uploadDoc.single("upload"),
+  uploadPOI.single("upload"),
   async (req, res) => {
-    if (req.fileError) {
-      return res.send("WRONG PASSPHRASE!");
-    }
     try {
+      let hash = "NA";
+
+      const ipfs = await IPFS.create();
+      const data = fs.readFileSync("./db/uploads/" + req.file.filename);
+      hash = await ipfs.add(data);
+      ipfs.stop();
+
       let result = await db.insertFile(
         req.session.data.user.type,
         req.session.data.user.id,
-        req.file.filename
+        req.file.filename,
+        hash.path
       );
 
       if (req.body.rid) {
@@ -329,7 +334,8 @@ app.post(
           Rtype,
           sid,
           req.body.rid,
-          req.file.filename
+          req.file.filename,
+          hash.path
         );
       }
       return res.json({ status: "success" });
@@ -342,11 +348,15 @@ app.post(
 app.get(
   "/getFiles",
   auth.checkAuth,
-  roleAuth.roleCheck([role.USER_ROLE.PROFESSIONAL]),
+  roleAuth.roleCheck([
+    role.USER_ROLE.PROFESSIONAL,
+    role.USER_ROLE.PATIENT,
+    role.ORG_ROLE.HOSPITAL,
+  ]),
   async (req, res) => {
     try {
-      const rid = req.session.data.user.id;
-      const sharedFiles = await db.getFiles(rid);
+      const receiverID = req.session.data.user.id;
+      const sharedFiles = await db.getFiles(receiverID);
 
       let files = [];
       const dir = "./db/uploads/";

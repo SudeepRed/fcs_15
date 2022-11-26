@@ -173,12 +173,12 @@ export async function approveApplication(id, type) {
     }
   }
 }
-export async function insertFile(type, id, filename) {
+export async function insertFile(type, id, filename, hash) {
   if (type == "user") {
     try {
       const result = await client.query(
-        `INSERT INTO USER_FILES VALUES ($1,$2);`,
-        [id, filename]
+        `INSERT INTO USER_FILES VALUES ($1,$2,$3) ON CONFLICT DO NOTHING; `,
+        [id, filename, hash]
       );
       return result.rows;
     } catch (e) {
@@ -251,15 +251,15 @@ export async function getPassphrase(type, id) {
     }
   }
 }
-export async function shareFile(Stype, Rtype, sid, rid, filename) {
+export async function shareFile(Stype, Rtype, sid, rid, filename, hash) {
   if (Stype == "user" && Rtype == "user") {
     try {
       const result = await client.query(
-        `INSERT INTO USER_SHARE_USER VALUES ($1,$2,$3) 
-        ON CONFLICT (sid,rid,filename)
+        `INSERT INTO USER_SHARE_USER VALUES ($1,$2,$3, $4) 
+        ON CONFLICT (sid,rid,filename,hash)
         DO 
-          UPDATE SET sid = $1, rid = $2, filename = $3;`,
-        [sid, rid, filename]
+          UPDATE SET sid = $1, rid = $2, filename = $3, hash = $4;`,
+        [sid, rid, filename, hash]
       );
       return result;
     } catch (e) {

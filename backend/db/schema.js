@@ -78,7 +78,8 @@ export async function createDB() {
     CREATE TABLE IF NOT EXISTS USER_FILES (
       id BIGINT NOT NULL,
       filename varchar(50) NOT NULL,
-      PRIMARY KEY(id, filename),
+      hash varchar(512) UNIQUE NOT NULL,
+      PRIMARY KEY(id, filename, hash),
       CONSTRAINT fk_user_file_id
           FOREIGN KEY(id) 
         REFERENCES users(id)
@@ -87,7 +88,8 @@ export async function createDB() {
     CREATE TABLE IF NOT EXISTS ORG_FILES (
       id BIGINT NOT NULL,
       filename varchar(50) NOT NULL,
-      PRIMARY KEY(id, filename),
+      hash varchar(512) UNIQUE NOT NULL,
+      PRIMARY KEY(id, filename, hash),
       CONSTRAINT fk_org_file_id
           FOREIGN KEY(id) 
         REFERENCES orgs(id)
@@ -103,7 +105,8 @@ export async function createDB() {
       sid bigint not null,
       rid bigint not null,
       filename varchar(50) not null,
-      PRIMARY KEY(sid, rid, filename),
+      hash varchar(512) not null,
+      PRIMARY KEY(sid, rid, filename, hash),
       CONSTRAINT fk_sid_user
           FOREIGN KEY(sid) 
         REFERENCES users(id),
