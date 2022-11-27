@@ -23,11 +23,11 @@ import * as requestIp from "request-ip";
 let logger = logs.createLogger("Bhamlo.log");
 
 const limiter = rateLimit({
-  windowMs: 1000*60*15, // 15 minutes
+  windowMs: 1000 * 60 * 15, // 15 minutes
   max: 300, // Limit each IP to 100 requests per `window` (here, per 15 minutes)
   keyGenerator: (req, res) => {
-    console.log(req.clientIp)
-    logger.info("IP ratelimited: "+ req.clientIp)
+    console.log(req.clientIp);
+    logger.info("IP ratelimited: " + req.clientIp);
     return req.clientIp; // IP address from requestIp.mw(), as opposed to req.ip
   },
 });
@@ -401,32 +401,54 @@ app.post(
           });
           return res.send("You have attempted to upload an unverified file!");
         }
+        console.log("Done");
       }
       let hash = "NA";
       const ipfs = await IPFS.create();
       const data = fs.readFileSync("./db/uploads/" + req.file.filename);
       hash = await ipfs.add(data);
       const ipfsStop = await ipfs.stop();
-
-      let result = await db.insertFile(
-        req.session.data.user.type,
-        req.session.data.user.id,
-        req.file.filename,
-        hash.path
-      );
+      const verify = await db.verifyHash(hash.path);
+      let sharedFileName = req.file.filename;
+      if (!verify) {
+        let result = await db.insertFile(
+          req.session.data.user.type,
+          req.session.data.user.id,
+          req.file.filename,
+          hash.path
+        );
+      } else {
+        sharedFileName = await db.getFileNameFromHash(hash.path);
+        if (fs.existsSync("./db/uploads/" + sharedFileName)) {
+          fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+            if (err) {
+              res.send("Oops! something went wrong!");
+            }
+            console.log("Deleted Duplicate File");
+            logger.info("Deleted Duplicate File");
+          });
+        } else {
+          await db.updateFileName(sharedFileName, req.file.filename);
+          sharedFileName = req.file.filename;
+        }
+      }
 
       if (req.body.rid) {
         const Stype = req.session.data.user.type;
         const Rtype = req.body.type;
         const sid = req.session.data.user.id;
-        result = await db.shareFile(
+
+        const result = await db.shareFile(
           Stype,
           Rtype,
           sid,
           req.body.rid,
-          req.file.filename,
+          sharedFileName,
           hash.path
         );
+        if (result == null) {
+          return res.send("The receiver doesnt exist");
+        }
       }
       return res.json({ status: "success" });
     } catch (err) {
@@ -457,7 +479,7 @@ app.get(
         if (fs.existsSync(dir + file.filename)) {
           files.push({
             path: dir + file.filename,
-            name: file.filename,
+            name: file.sid + "_" + file.filename,
           });
         }
       });
@@ -486,12 +508,14 @@ app.post(
       hash = await ipfs.add(data);
       const ipfsStop = await ipfs.stop();
 
-      let result = await db.insertFile(
-        req.session.data.user.type,
-        req.session.data.user.id,
-        req.file.filename,
-        hash.path
-      );
+      let result = await db.insertHash(hash.path);
+      fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+        if (err) {
+          res.send("Oops! something went wrong!");
+        }
+
+        logger.info("Uploaded File deleted /upload");
+      });
 
       return res.json({ status: "success" });
     } catch (err) {

@@ -82,6 +82,18 @@ export async function createDB() {
   }
   try {
     await client.query(`
+    CREATE TABLE IF NOT EXISTS HASH (
+      hash varchar(512),
+      PRIMARY KEY (HASH)
+      );
+
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+  try {
+    await client.query(`
     CREATE TABLE IF NOT EXISTS USER_FILES (
       id BIGINT NOT NULL,
       filename varchar(50) NOT NULL,
@@ -90,7 +102,11 @@ export async function createDB() {
       CONSTRAINT fk_user_file_id
           FOREIGN KEY(id) 
         REFERENCES users(id)
-        ON DELETE CASCADE
+        ON DELETE CASCADE,
+    CONSTRAINT fk_file_hash
+        FOREIGN KEY(hash) 
+      REFERENCES hash(hash)
+      ON DELETE CASCADE    
     );
     CREATE TABLE IF NOT EXISTS ORG_FILES (
       id BIGINT NOT NULL,
@@ -104,7 +120,7 @@ export async function createDB() {
     );
     `);
   } catch (err) {
-    console.log(err);
+    console.log(err,"user_files");
     logger.error(err);
   }
   try {
@@ -121,6 +137,48 @@ export async function createDB() {
       CONSTRAINT fk_rid_user
           FOREIGN KEY(rid) 
         REFERENCES users(id)
+      
+    )
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS org_share_user(
+      sid bigint not null,
+      rid bigint not null,
+      filename varchar(50) not null,
+      hash varchar(512) not null,
+      PRIMARY KEY(sid, rid, filename, hash),
+      CONSTRAINT fk_sid_org
+          FOREIGN KEY(sid) 
+        REFERENCES orgs(id),
+      CONSTRAINT fk_rid_user
+          FOREIGN KEY(rid) 
+        REFERENCES users(id)
+      
+    )
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS user_share_org(
+      sid bigint not null,
+      rid bigint not null,
+      filename varchar(50) not null,
+      hash varchar(512) not null,
+      PRIMARY KEY(sid, rid, filename, hash),
+      CONSTRAINT fk_sid_user
+          FOREIGN KEY(sid) 
+        REFERENCES users(id),
+      CONSTRAINT fk_rid_org
+          FOREIGN KEY(rid) 
+        REFERENCES orgs(id)
       
     )
     `);
@@ -180,5 +238,6 @@ export async function createDB() {
     console.log(err);
     logger.error(err);
   }
+
   //END
 }

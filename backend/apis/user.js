@@ -7,8 +7,9 @@ let logger = logs.createLogger("./Bhamlo.log");
 import express from "express";
 import { statusCheck } from "../controllers/status.js";
 export const router = express.Router();
-router.use(statusCheck);
 router.use(checkAuth);
+router.use(statusCheck);
+
 
 router.post(
   "/editprofile",

@@ -43,10 +43,11 @@
   </div>
   <div class="club">
     <div style="display:flex; flex-direction: row;">
-      <div>
+      <div style="border-right: 4px  solid; padding: 15px">
         <% if ( typeof data.orgs !='undefined' ){ %>
           <% data.orgs.forEach(function(org) { %>
             <p>
+              <%= org.id %>
               <%= org.name %>
             </p>
             <% }) %>
@@ -55,6 +56,10 @@
                   <button type="submit">Get orgs</button>
                 </form>
       </div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
+      <div>&nbsp;</div>
       <div>
         <% if ( typeof data.professionals !='undefined' ){ %>
           <% data.professionals.forEach(function(professionals) { %>

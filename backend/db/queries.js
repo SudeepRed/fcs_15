@@ -191,12 +191,15 @@ export async function insertFile(type, id, filename, hash) {
   if (type == "user") {
     try {
       const result = await client.query(
-        `INSERT INTO USER_FILES VALUES ($1,$2,$3) ON CONFLICT DO NOTHING; `,
+        `INSERT INTO USER_FILES VALUES ($1,$2,$3)
+        ON CONFLICT (hash)
+        DO 
+          UPDATE SET hash = $3;`,
         [id, filename, hash]
       );
       return result.rows;
     } catch (err) {
-      console.log(err);
+      console.log(err, "insertFile");
       logger.error(err);
       return null;
     }
@@ -288,14 +291,56 @@ export async function shareFile(Stype, Rtype, sid, rid, filename, hash) {
       return null;
     }
   }
+  if (Stype == "user" && Rtype == "org") {
+    try {
+      const result = await client.query(
+        `INSERT INTO USER_SHARE_ORG VALUES ($1,$2,$3, $4) 
+        ON CONFLICT (sid,rid,filename,hash)
+        DO 
+          UPDATE SET sid = $1, rid = $2, filename = $3, hash = $4;`,
+        [sid, rid, filename, hash]
+      );
+      return result;
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      return null;
+    }
+  }
+  if (Rtype == "user" && Stype == "org") {
+    try {
+      const result = await client.query(
+        `INSERT INTO ORG_SHARE_USER VALUES ($1,$2,$3, $4) 
+        ON CONFLICT (sid,rid,filename,hash)
+        DO 
+          UPDATE SET sid = $1, rid = $2, filename = $3, hash = $4;`,
+        [sid, rid, filename, hash]
+      );
+      return result;
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+      return null;
+    }
+  }
 }
 export async function getFiles(rid) {
   try {
-    const result = await client.query(
+    const result1 = await client.query(
       `SELECT sid, filename FROM user_share_user where rid = $1`,
       [rid]
     );
-    return result.rows;
+    const result2 = await client.query(
+      `SELECT sid, filename FROM user_share_org where rid = $1`,
+      [rid]
+    );
+    const result3 = await client.query(
+      `SELECT sid, filename FROM org_share_user where rid = $1`,
+      [rid]
+    );
+    const result = [...result1.rows, ...result2.rows, ...result3.rows];
+    console.log(result);
+    return result;
   } catch (err) {
     console.log(err);
     logger.error(err);
@@ -309,6 +354,7 @@ export async function getMyfiles(type, id) {
         `SELECT filename FROM user_files where id = $1`,
         [id]
       );
+      console.log(result.rows);
       return result.rows;
     } catch (err) {
       console.log(err);
@@ -479,11 +525,46 @@ export async function getPOI(id) {
 }
 export async function verifyHash(hash) {
   try {
+    const result = await client.query(`select hash from hash where hash = $1`, [
+      hash,
+    ]);
+    return result.rows.length > 0;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+    return null;
+  }
+}
+export async function insertHash(hash) {
+  try {
+    const result = await client.query(`INSERT INTO HASH VALUES ($1)`, [hash]);
+    return;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+    return null;
+  }
+}
+export async function getFileNameFromHash(hash) {
+  try {
     const result = await client.query(
-      `select hash from user_files where hash = $1`,
+      `SELECT filename FROM user_files WHERE hash = $1`,
       [hash]
     );
-    return result.rows.length > 0;
+    return result.rows[0].filename;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+    return null;
+  }
+}
+export async function updateFileName(oldName, newName) {
+  try {
+    const result = await client.query(
+      `UPDATE USER_FILES SET FILENAME = $2 WHERE FILENAME=$1;`,
+      [oldName, newName]
+    );
+    return;
   } catch (err) {
     console.log(err);
     logger.error(err);
