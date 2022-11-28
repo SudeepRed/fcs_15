@@ -413,7 +413,13 @@ app.post(
       const result = await db.deleteMyFile(type, req.body.name);
       if (result.status == "done") {
         const dir = "./db/uploads/" + req.body.name;
-        fs.unlinkSync(dir);
+        fs.unlink(dir, (err) => {
+          if (err) {
+            res.send("Oops! something went wrong!");
+          }
+          console.log("Deleted  File /deletefile");
+          logger.info("Deleted  File /deletefile");
+        });
       }
       return res.send("deleted");
     } catch (err) {
