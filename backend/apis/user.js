@@ -113,7 +113,8 @@ router.get(
         req.session.data.user.id,
         req.session.data.user.role
       );
-      return res.json(data);
+      req.session.data.showtransactions = data;
+      return res.redirect("/");
     } catch (err) {
       console.log(err);
       logger.error(err);
@@ -167,7 +168,7 @@ router.get(
         req.session.data.user.role
       );
       req.session.data.claims = data;
-      return res.send(data);
+      return res.redirect("/");
     } catch (err) {
       console.log(err);
       logger.error(err);

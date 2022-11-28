@@ -368,7 +368,8 @@ app.get("/getmyfiles", auth.checkAuth, async (req, res) => {
     if (files.length == 0) {
       return res.send("Oops! Seems like there are no documents");
     }
-    return res.json(files);
+    req.session.data.getmyfiles = files;
+    return res.redirect("/");
   } catch (err) {
     console.log(err);
     logger.error(err);

@@ -21,23 +21,25 @@
         <!-- <%= JSON.stringify(data.user) %><br> -->
         <b>Name: </b>
         <%= data.user.name %><br>
-          <b>Your Email: </b>
-          <%= data.user.email %><br>
-            <b>Your Age: </b>
-            <%= data.user.age || "Not yet updated" %><br>
-              <b>Your Height: </b>
-              <%= data.user.height || "Not yet updated" %><br>
-                <b>Your Weight: </b>
-                <%= data.user.weight || "Not yet updated" %><br>
-                  <b>Your address: : </b>
-                  <%= data.user.address || "Not yet updated" %><br>
-                    <b>Your allergies: : </b>
-                    <%= data.user.allergies || "none" %><br>
-                      <b>Wallet Amount: : </b>
-                      <%= data.user.wallet %><br>
-                        your application is <b>
-                          <%= data.user.status %>
-                        </b><br>
+          <b>ID: </b>
+          <%= data.user.id %><br>
+            <b>Your Email: </b>
+            <%= data.user.email %><br>
+              <b>Your Age: </b>
+              <%= data.user.age || "Not yet updated" %><br>
+                <b>Your Height: </b>
+                <%= data.user.height || "Not yet updated" %><br>
+                  <b>Your Weight: </b>
+                  <%= data.user.weight || "Not yet updated" %><br>
+                    <b>Your address: : </b>
+                    <%= data.user.address || "Not yet updated" %><br>
+                      <b>Your allergies: : </b>
+                      <%= data.user.allergies || "none" %><br>
+                        <b>Wallet Amount: : </b>
+                        <%= data.user.wallet %><br>
+                          your application is <b>
+                            <%= data.user.status %>
+                          </b><br>
       </p>
       <% } %>
   </div>
@@ -163,108 +165,188 @@
             </button>
           </form>
 
+
+
           <form action="/admin/getapplications" method="GET">
             <button type="submit" name="type" value="user">
               <h3>See all Pending User Applications</h3>
             </button>
           </form>
+
+
           <form action="/admin/getapplications" method="GET">
             <button type="submit" name="type" value="org">
               <h3>See all Pending Org Applications</h3>
             </button>
           </form>
-
-
-
-          <% }} %>
     </div>
+    <% }} %>
 
-
-    <div>
       <% if ( typeof data.applications !='undefined' && data.applications.length> 0 ){ %>
-        <h3>Pending Applications</h3>
-        <% data.applications.forEach(function(application) { %>
+        <div>
+          <h3>Pending Applications</h3>
+          <table>
+            <tr>
+              <th>Applicant ID</th>
+              <th>Applicant Name</th>
+              <th>Applicant Email</th>
+              <th>Applicant Role</th>
+              <th>Applicant Address</th>
+              <th>Applicant Contact Details</th>
+              <th>Applicant Description</th>
+            </tr>
 
-          <p>
-            <%= application.id %>
-              <%= application.name %>
-                <%= application.role %>
+            <% data.applications.forEach(function(application) { %>
 
-          </p>
+              <tr>
+                <td>
+                  <%= application.id %>
+                </td>
+                <td>
+                  <%= application.name || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.email || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.role || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.address || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.contactDetails || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.description || "Not yet updated" %>
+                </td>
+              </tr>
 
-          <% }) %>
-            <% } %>
-              <% if ( typeof data.all !='undefined' ){ %>
-                <h3>All Entities</h3>
-                <% data.all.users.forEach(function(application) { %>
+              <% }) %>
+          </table>
+          <% } %>
+        </div>
 
-                  <p>
-                    <%= application.id %>
-                      <%= application.name %>
-                        <%= application.email %>
-                  </p>
+        <% if ( typeof data.all !='undefined' ){ %>
+          <h3>All Entities</h3>
+          <table>
+            <tr>
+              <th>Applicant ID</th>
+              <th>Applicant Name</th>
+              <th>Applicant Email</th>
+              <th>Applicant Role</th>
+              <th>Applicant Address</th>
+              <th>Applicant Contact Details</th>
+              <th>Applicant Description</th>
+            </tr>
+
+            <% data.all.users.forEach(function(application) { %>
+
+              <tr>
+                <td>
+                  <%= application.id %>
+                </td>
+                <td>
+                  <%= application.name || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.email || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.role || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.address || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= application.contactDetails || "NA" %>
+                </td>
+                <td>
+                  <%= application.description || "NA" %>
+                </td>
+              </tr>
+
+              <% }) %>
+
+                <% data.all.orgs.forEach(function(application) { %>
+
+                  <tr>
+                    <td>
+                      <%= application.id %>
+                    </td>
+                    <td>
+                      <%= application.name || "Not yet updated" %>
+                    </td>
+                    <td>
+                      <%= application.email || application.domain|| "Not yet updated" %>
+                    </td>
+                    <td>
+                      <%= application.role ||"Not yet updated" %>
+                    </td>
+                    <td>
+                      <%= application.address || "Not yet updated" %>
+                    </td>
+                    <td>
+                      <%= application.contactDetails || "Not yet updated" %>
+                    </td>
+                    <td>
+                      <%= application.description || "Not yet updated" %>
+                    </td>
+                  </tr>
 
                   <% }) %>
-                    <% data.all.orgs.forEach(function(application) { %>
+          </table>
 
-                      <p>
-                        <%= application.id %>
-                          <%= application.name %>
-                            <%= application.domain %>
-                      </p>
+          <% } %>
 
-                      <% }) %>
 
-                        <% } %>
 
-    </div>
-
-    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
-      <% if ( typeof data.user !='undefined' ){ %>
-        <% if(data.user.role=='admin' ) {%>
-          <form action="/admin/download" method="POST" style="border-right: 4px  solid; padding: 15px">
-            <div>
-              <label for="id">Enter application ID</label>
-              <input type="number" id="updateField" name="id" />
+            <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+              <% if ( typeof data.user !='undefined' ){ %>
+                <% if(data.user.role=='admin' ) {%>
+                  <form action="/admin/download" method="POST" style="border-right: 4px  solid; padding: 15px">
+                    <div>
+                      <label for="id">Enter application ID</label>
+                      <input type="number" id="updateField" name="id" />
+                    </div>
+                    <button type="submit">
+                      <p>Download POI Documents</p>
+                    </button>
+                  </form>
+                  <form action="/admin/approve" method="POST" style="border-right: 4px  solid; padding: 15px">
+                    <div>
+                      <label for="id">Enter application ID</label>
+                      <input type="number" id="updateField" name="id" />
+                    </div>
+                    <div>
+                      <label for="type">Select Type</label>
+                      <select name="type" id="type" required>
+                        <option value="org">Organization</option>
+                        <option value="user">User</option>
+                      </select>
+                    </div>
+                    <button type="submit">
+                      <p>Approve</p>
+                    </button>
+                  </form>
+                  <form action="/admin/delete" method="POST">
+                    <div>
+                      <label for="id">Enter application ID</label>
+                      <input type="number" id="updateField" name="id" />
+                    </div>
+                    <div>
+                      <label for="type">Select Type</label>
+                      <select name="type" id="type" required>
+                        <option value="org">Organization</option>
+                        <option value="user">User</option>
+                      </select>
+                    </div>
+                    <button type="submit">
+                      <p>Delete Entity</p>
+                    </button>
+                  </form>
+                  <% }} %>
             </div>
-            <button type="submit">
-              <p>Download POI Documents</p>
-            </button>
-          </form>
-          <form action="/admin/approve" method="POST" style="border-right: 4px  solid; padding: 15px">
-            <div>
-              <label for="id">Enter application ID</label>
-              <input type="number" id="updateField" name="id" />
-            </div>
-            <div>
-              <label for="type">Select Type</label>
-              <select name="type" id="type" required>
-                <option value="org">Organization</option>
-                <option value="user">User</option>
-              </select>
-            </div>
-            <button type="submit">
-              <p>Approve</p>
-            </button>
-          </form>
-          <form action="/admin/delete" method="POST">
-            <div>
-              <label for="id">Enter application ID</label>
-              <input type="number" id="updateField" name="id" />
-            </div>
-            <div>
-              <label for="type">Select Type</label>
-              <select name="type" id="type" required>
-                <option value="org">Organization</option>
-                <option value="user">User</option>
-              </select>
-            </div>
-            <button type="submit">
-              <p>Delete Entity</p>
-            </button>
-          </form>
-          <% }} %>
-    </div>
   </div>
 
   <div class="club">
@@ -313,11 +395,32 @@
     </div>
   </div>
 
+
   <div class="club">
     <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
-      <form action="/getMyFiles" method="GET" style="border-right: 4px  solid; padding: 15px">
-        <button type="submit">Get My Files</button>
-      </form>
+      <div style="border-right: 4px  solid; padding: 15px">
+        <% if ( typeof data.getmyfiles !='undefined' && data.getmyfiles.length> 0 ){ %>
+
+          <h3>My files</h3>
+          <table>
+            <tr>
+              <th>filename</th>
+            </tr>
+
+            <% data.getmyfiles.forEach(function(file) { %>
+              <tr>
+                <td>
+                  <%= file.name %>
+                </td>
+              </tr>
+              <% }) %>
+          </table>
+
+          <% } %>
+            <form action="/getMyFiles" method="GET">
+              <button type="submit">Get My Files</button>
+            </form>
+      </div>
       <form action="/deletefile" method="POST" style="border-right: 4px  solid; padding: 15px;">
         <div>
           <label for="id">Enter file name to be deleted</label>
@@ -332,43 +435,130 @@
 
     </div>
   </div>
-  <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
-    <% if ( typeof data.user !='undefined' ){ %>
-      <% if(data.user.role=='patient' ) {%>
-        <form action="/user/showtransactions" method="GET">
-          <button type="submit">Show All my Medical transactions</button>
-        </form>
-        <div>
-          <form action="/user/showInsurance" method="GET">
+  <div class="club">
+    <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+      <% if ( typeof data.user !='undefined' ){ %>
+        <% if(data.user.role=='patient' ) {%>
 
-            <button type="submit">SHOW ALL Insurance COMPANIES</button>
+          <form action="/user/showtransactions" method="GET" style="border-right: 4px  solid; padding: 15px">
+            <button type="submit">Show All my Medical transactions</button>
           </form>
-        </div>
-        <div>
-          <form action="/user/raiseClaim" method="POST">
-            <div>
-              <label for="trid">Enter Transaction ID</label>
-              <input type="number" id="updateField" name="trid" required />
-            </div>
-            <div>
-              <label for="trid">Enter Insurance Company ID</label>
-              <input type="number" id="updateField" name="vid" required />
-            </div>
-            <button type="submit">Raise Insurance Claim for this Transaction</button>
+
+
+          <div>
+            <form action="/user/raiseClaim" method="POST">
+              <div>
+                <label for="trid">Enter Transaction ID</label>
+                <input type="number" id="updateField" name="trid" required />
+              </div>
+              <div>
+                <label for="trid">Enter Insurance Company ID</label>
+                <input type="number" id="updateField" name="vid" required />
+              </div>
+              <button type="submit">Raise Insurance Claim for this Transaction</button>
+            </form>
+          </div>
+
+          <form action="/user/showclaims" method="GET">
+
+            <button type="submit">
+              Show all PENDING Claims raised
+            </button>
           </form>
-        </div>
-
-        <form action="/user/showclaims" method="GET">
-
-          <button type="submit">
-            Show all PENDING Claims raised
-          </button>
-        </form>
 
 
-        <% }} %>
+          <% }} %>
+    </div>
   </div>
+  <div style="border-right: 4px  solid; padding: 15px">
+    <% if ( typeof data.showtransactions !='undefined' && data.showtransactions.length> 0 ){ %>
 
+      <h3>My Transactions</h3>
+      <table>
+        <tr>
+          <th>Transaction id</th>
+          <th>User id</th>
+          <th>Vendor id</th>
+          <th>Drug id</th>
+          <th>Price</th>
+
+          <th>status</th>
+        </tr>
+
+        <% data.showtransactions.forEach(function(transac) { %>
+          <tr>
+            <td>
+              <%= transac.transaction_id %>
+            </td>
+            <td>
+              <%= transac.uid %>
+            </td>
+            <td>
+              <%= transac.vid %>
+            </td>
+            <td>
+              <%= transac.did %>
+            </td>
+            <td>
+              <%= transac.price %>
+            </td>
+
+            <td>
+              <%= transac.status %>
+            </td>
+          </tr>
+          <% }) %>
+      </table>
+
+      <% } %>
+
+  </div>
+  <div style="border-right: 4px  solid; padding: 15px">
+    <% if ( typeof data.claims !='undefined' && data.claims.length> 0 ){ %>
+
+      <h3>Claims</h3>
+      <table>
+        <tr>
+          <th>Claim id</th>
+          <th>User id</th>
+          <th>Drug id</th>
+          <th>Transaction id</th>
+          <th>Vendor id</th>
+          <th>Amount</th>
+          <th>status</th>
+        </tr>
+
+        <% data.claims.forEach(function(claim) { %>
+          <tr>
+            <td>
+              <%= claim.id %>
+            </td>
+            <td>
+              <%= claim.uid %>
+            </td>
+            <td>
+              <%= claim.did %>
+            </td>
+            <td>
+              <%= claim.tid %>
+            </td>
+            <td>
+              <%= claim.vid %>
+            </td>
+            <td>
+              <%= claim.amount %>
+            </td>
+
+            <td>
+              <%= claim.status %>
+            </td>
+          </tr>
+          <% }) %>
+      </table>
+
+      <% } %>
+
+  </div>
 
   <% if ( typeof data.user !='undefined' ){ %>
     <% if(data.user.role=='pharmacy' ) {%>
@@ -410,19 +600,10 @@
                 </div>
                 <% }} %>
                   <div style="border-right: 4px  solid; padding: 15px">
-                    <% if ( typeof data.drugs !='undefined' ){ %>
-                      <% data.drugs.forEach(function(drug) { %>
-                        <p>
-                          DRUG ID: <%= drug.id %>
-                            DRUG NAME:<%= drug.name %>
-                              DRUG PRICE:<%= drug.price %>
-                                VENDOR ID: <%= drug.vid %>
-                        </p>
-                        <% }) %>
-                          <% } %>
-                            <form action="/user/showdrugs" method="GET">
-                              <button type="submit">SHOW DRUGS</button>
-                            </form>
+
+                    <form action="/user/showdrugs" method="GET">
+                      <button type="submit">SHOW DRUGS</button>
+                    </form>
                   </div>
                   <form action="/user/buydrug" method="POST">
                     <div>
@@ -457,6 +638,44 @@
                 </button>
               </form>
               <% }} %>
+        </div>
+        <div style="border-right: 4px  solid; padding: 15px">
+          <% if ( typeof data.drugs !='undefined' && data.drugs.length> 0 ){ %>
+
+            <h3>Available Drugs</h3>
+            <table>
+              <tr>
+
+                <th>Drug id</th>
+                <th>Drug Name</th>
+                <th>Vendor id</th>
+                <th>Amount</th>
+
+              </tr>
+
+              <% data.drugs.forEach(function(drug) { %>
+                <tr>
+
+                  <td>
+                    <%= drug.id %>
+                  </td>
+                  <td>
+                    <%= drug.name %>
+                  </td>
+                  <td>
+                    <%= drug.vid %>
+                  </td>
+                  <td>
+                    <%= drug.price %>
+                  </td>
+
+
+                </tr>
+                <% }) %>
+            </table>
+
+            <% } %>
+
         </div>
         <form action="/logout" method="POST">
           <button type="submit">

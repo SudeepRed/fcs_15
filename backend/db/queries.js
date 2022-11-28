@@ -368,7 +368,7 @@ export async function deleteMyFile(type, name) {
 
 export async function getUsers() {
   try {
-    const result = await client.query(`SELECT id, name, email FROM USERS;`);
+    const result = await client.query(`SELECT id, name, email, role FROM USERS;`);
     return result.rows;
   } catch (err) {
     console.log(err);
