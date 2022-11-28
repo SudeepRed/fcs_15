@@ -14,6 +14,23 @@ export async function createUser(user) {
     sysLogger.error(err);
   }
 }
+export async function updateOrg(user) {
+  try {
+    await client.query(
+      `UPDATE orgs
+    SET 
+    name = $1, 
+    location = $2,
+    contactDetails = $3,
+    description = $4
+    WHERE id = $5;`,
+      [user.name, user.location, user.contactDetails, user.description, user.id]
+    );
+  } catch (err) {
+    console.log(err);
+    sysLogger.error(err);
+  }
+}
 export async function updateUser(user) {
   try {
     await client.query(
@@ -24,8 +41,9 @@ export async function updateUser(user) {
     height= $3,
     weight = $4, 
     address= $5,
-    allergies = $6 
-    WHERE id = $7;`,
+    allergies = $6,
+    location = $7 
+    WHERE id = $8;`,
       [
         user.name,
         user.age,
@@ -33,6 +51,7 @@ export async function updateUser(user) {
         user.weight,
         user.address,
         user.allergies,
+        user.location,
         user.id,
       ]
     );
@@ -118,6 +137,67 @@ export async function getUsersByRole(role) {
       role,
     ]);
     return result.rows;
+  } catch (err) {
+    console.log(err);
+    sysLogger.error(err);
+    return null;
+  }
+}
+export async function search(type, name, location) {
+  try {
+    if (type == "professional") {
+      let q = [];
+      let mq = `select * from users where ROLE = 'professional'`;
+      let count = 1;
+      if (name != "") {
+        mq = mq + ` AND name ~* $` + count.toString();
+        count = count + 1;
+        q.push(name);
+      }
+      if (location != "") {
+        mq = mq + ` AND location ~* $` + count.toString();
+        count = count + 1;
+        q.push(location);
+      }
+      console.log(mq);
+      const result = await client.query(mq + ` ;`, q);
+      console.log(result);
+      return result.rows;
+    } else if (
+      type == "hospital" ||
+      type == "pharmacy" ||
+      type == "insurance"
+    ) {
+      let q = [type];
+      let mq = `select * from orgs where role = $1`;
+      let count = 2;
+      if (name != "") {
+        mq = mq + ` AND name ~* $` + count.toString();
+        count = count + 1;
+        q.push(name);
+      }
+      if (location != "") {
+        mq = mq + ` AND location ~* $` + count.toString();
+        count = count + 1;
+        q.push(location);
+      }
+      if (count == 1) {
+        mq = `select * from orgs `;
+      }
+      console.log(mq);
+      const result = await client.query(mq + ` ;`, q);
+      console.log(result);
+      return result.rows;
+    } else if (type == "all") {
+      let users = await client.query(
+        `SELECT * FROM USERS WHERE role = 'professional';`
+      );
+      let orgs = await client.query(`SELECT * FROM ORGS`);
+      const result = [...users.rows, ...orgs.rows];
+      return result;
+    } else {
+      return [];
+    }
   } catch (err) {
     console.log(err);
     sysLogger.error(err);
@@ -368,7 +448,9 @@ export async function deleteMyFile(type, name) {
 
 export async function getUsers() {
   try {
-    const result = await client.query(`SELECT id, name, email, role FROM USERS;`);
+    const result = await client.query(
+      `SELECT id, name, email, role FROM USERS;`
+    );
     return result.rows;
   } catch (err) {
     console.log(err);
@@ -733,6 +815,29 @@ export async function getOTPTime(otp, email) {
   } catch (err) {
     console.log(err, "insertOTP");
     sysLogger.error(err, "insertOTP");
+    return null;
+  }
+}
+export async function addtowallet(amount, type, id) {
+  try {
+    if (type == "user") {
+      await client.query("update users set wallet = $1 where id = $2;", [
+        amount,
+        id,
+      ]);
+      return true;
+    } else if (type == "org") {
+      await client.query("update orgs set wallet = $1 where id = $2;", [
+        amount,
+        id,
+      ]);
+      return true;
+    } else {
+      return null;
+    }
+  } catch (err) {
+    console.log(err);
+    sysLogger.error(err);
     return null;
   }
 }

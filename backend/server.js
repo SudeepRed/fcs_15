@@ -586,6 +586,44 @@ app.post(
   }
 );
 
+app.post("/addToWallet", auth.checkAuth, async (req, res) => {
+  if (req.body.getOtp != undefined && req.body.addtowallet == undefined) {
+    otp.sendMail(req.session.data.user.email || req.session.data.user.domain);
+    return false;
+  }
+  if (req.body.addtowallet != undefined && req.body.getOtp == undefined) {
+    if (
+      await otp.verifyOtp(
+        req.body.otp,
+        req.session.data.user.email || req.session.data.user.domain
+      )
+    ) {
+      try {
+        const t = await db.addtowallet(
+          parseInt(req.body.amount) + req.session.data.user.wallet,
+          req.session.data.user.type,
+          req.session.data.user.id
+        );
+        if (t == null) {
+          return res.send("Failed");
+        } else {
+          req.session.data.user.wallet =
+            parseInt(req.body.amount) + req.session.data.user.wallet;
+          return res.send(
+            "Success, please login again to see the updated wallet"
+          );
+        }
+      } catch (err) {
+        console.log(err);
+        logger.error(err);
+      }
+    } else {
+      return res.send("Wrong OTP");
+    }
+  } else {
+    return res.send("Failed!");
+  }
+});
 app.post("/logout", auth.checkAuth, (req, res) => {
   req.session.destroy();
   res.redirect("/login");

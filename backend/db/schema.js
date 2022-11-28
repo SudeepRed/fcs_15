@@ -271,6 +271,15 @@ export async function createDB() {
     console.log(err);
     logger.error(err);
   }
+  try {
+    await client.query(`
+    ALTER TABLE USERS
+    ADD IF NOT EXISTS LOCATION VARCHAR(100) DEFAULT '';
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
 
   //END
 }

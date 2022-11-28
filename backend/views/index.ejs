@@ -17,8 +17,8 @@
         </b> ! </h1>
       <h2>You are a <%= data.user.role %>
       </h2>
-      <p>
-        <!-- <%= JSON.stringify(data.user) %><br> -->
+
+      <% if ( data.user.type=='user' ){ %>
         <b>Name: </b>
         <%= data.user.name %><br>
           <b>ID: </b>
@@ -33,125 +33,116 @@
                   <%= data.user.weight || "Not yet updated" %><br>
                     <b>Your address: : </b>
                     <%= data.user.address || "Not yet updated" %><br>
-                      <b>Your allergies: : </b>
-                      <%= data.user.allergies || "none" %><br>
-                        <b>Wallet Amount: : </b>
-                        <%= data.user.wallet %><br>
-                          your application is <b>
-                            <%= data.user.status %>
-                          </b><br>
-      </p>
-      <% } %>
+                      <b>Your Location:</b>
+                      <%= data.user.location || "Not yet updated" %><br>
+                        <b>Your allergies:</b>
+                        <%= data.user.allergies || "none" %><br>
+                          <b>Wallet Amount:</b>
+                          <%= data.user.wallet %><br>
+                            your application is <b>
+                              <%= data.user.status %>
+                            </b><br>
+
+                            <% } %>
+                              <% if ( data.user.type=='org' ){ %>
+                                <b>Name: </b>
+                                <%= data.user.name %><br>
+                                  <b>ID: </b>
+                                  <%= data.user.id %><br>
+                                    <b>Your Domain Email: </b>
+                                    <%= data.user.domain %><br>
+
+
+                                      <b>Your Location:</b>
+                                      <%= data.user.location || "Not yet updated" %><br>
+                                        <b>Your ContactDetails:</b>
+                                        <%= data.user.contactDetails || "none" %><br>
+                                          <b>Your Description:</b>
+                                          <%= data.user.description || "none" %><br>
+                                            <b>Wallet Amount:</b>
+                                            <%= data.user.wallet %><br>
+                                              your application is <b>
+                                                <%= data.user.status %>
+                                              </b><br>
+                                              <% } %>
+                                                <% } %>
   </div>
   <div class="club">
     <div style="display:flex; flex-direction: row;">
-      <div style="border-right: 4px  solid; padding: 15px">
-        <% if ( typeof data.orgs !='undefined' ){ %>
-          <table>
-            <tr>
-              <th>Org ID</th>
-              <th>Org Name</th>
-              <th>Org Type</th>
-              <th>Org Address</th>
-              <th>Org Contact Details</th>
-              <th>Org Description</th>
-            </tr>
-            <% data.orgs.forEach(function(org) { %>
-              <tr>
-                <td>
-                  <%= org.id %>
-                </td>
-                <td>
-                  <%= org.name || "Not yet updated" %>
-                </td>
-                <td>
-                  <%= org.role %>
-                </td>
-                <td>
-                  <%= org.address || "Not yet updated" %>
-                </td>
-                <td>
-                  <%= org.contactDetails || "Not yet updated" %>
-                </td>
-                <td>
-                  <%= org.description || "Not yet updated" %>
-                </td>
-              </tr>
-              <% }) %>
-          </table>
-          <% } %>
-            <form action="/user/getorgs" method="GET">
-              <button type="submit">Get orgs</button>
-            </form>
-      </div>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-      <div>&nbsp;</div>
-      <div>
-        <% if ( typeof data.professionals !='undefined' ){ %>
-          <table>
-            <tr>
-              <th>Professional's ID</th>
-              <th>Professional's Name</th>
-              <th>Professional's Type</th>
-              <th>Professional's Address</th>
-            </tr>
-            <% data.professionals.forEach(function(professionals) { %>
-              <tr>
+      <form action="/addToWallet" method="POST">
+        <div>
+          <label for="name">Amount</label>
+          <input type="number" id="updateField" name="amount" />
+        </div>
+        <div>
+          <label for="otp">Enter OTP</label>
+          <input class="input" type="text" name="otp" id="input4" />
+        </div>
+        <button type="submit" name="getOtp">Get otp</button>
 
-                <td>
-                  <%= professionals.id %>
-                </td>
-                <td>
-                  <%= professionals.name %>
-                </td>
-                <td>
-                  <%= professionals.role %>
-                </td>
-                <td>
-                  <%= professionals.address || "Not yet updated" %>
-                </td>
-              </tr>
-              <% }) %>
-          </table>
-          <% } %>
-            <form action="/user/getprofessionals" method="GET">
-              <button type="submit">Get professionals</button>
-            </form>
-      </div>
+
+        <button type="submit" name="addtowallet">Add money to wallet</button>
+      </form>
     </div>
+
   </div>
 
 
   <div class="club">
-    <form action="/user/editprofile" method="POST">
-      <div>
-        <label for="name">Name</label>
-        <input type="text" id="updateField" name="name" />
-      </div>
-      <div>
-        <label>Age</label>
-        <input type="number" id="updateField" name="age" />
-      </div>
-      <div>
-        <label>Height</label>
-        <input type="number" id="updateField" name="height" />
-      </div>
-      <div>
-        <label>Weight</label>
-        <input type="number" id="updateField" name="weight" />
-      </div>
-      <div>
-        <label>Address</label>
-        <input type="text" id="updateField" name="address" />
-      </div>
-      <div>
-        <label>Allergies</label>
-        <input type="text" id="updateField" name="allergies" />
-      </div>
-      <button type="submit">UpdateProfile</button>
-    </form>
+    <% if(data.user.role=='admin' || data.user.role=='patient' || data.user.role=='professional' ) {%>
+      <form action="/user/edituserprofile" method="POST">
+        <div>
+          <label for="name">Name</label>
+          <input type="text" id="updateField" name="name" />
+        </div>
+        <div>
+          <label>Age</label>
+          <input type="number" id="updateField" name="age" />
+        </div>
+        <div>
+          <label>Height</label>
+          <input type="number" id="updateField" name="height" />
+        </div>
+        <div>
+          <label>Weight</label>
+          <input type="number" id="updateField" name="weight" />
+        </div>
+        <div>
+          <label>Address</label>
+          <input type="text" id="updateField" name="address" />
+        </div>
+        <div>
+          <label>Allergies</label>
+          <input type="text" id="updateField" name="allergies" />
+        </div>
+        <div>
+          <label>Location</label>
+          <input type="text" id="updateField" name="location" />
+        </div>
+        <button type="submit">UpdateProfile</button>
+      </form>
+      <% } %>
+        <% if(data.user.role=='hospital' || data.user.role=='pharmacy' || data.user.role=='insurance' ) {%>
+          <form action="/user/editorgprofile" method="POST">
+            <div>
+              <label for="name">Name</label>
+              <input type="text" id="updateField" name="name" />
+            </div>
+            <div>
+              <label>Location</label>
+              <input type="text" id="updateField" name="location" />
+            </div>
+            <div>
+              <label>Contact Details</label>
+              <input type="text" id="updateField" name="contactDetails" />
+            </div>
+            <div>
+              <label>Description</label>
+              <input type="text" id="updateField" name="description" />
+            </div>
+            <button type="submit">Update Profile</button>
+          </form>
+          <% } %>
   </div>
 
   <div class="club">

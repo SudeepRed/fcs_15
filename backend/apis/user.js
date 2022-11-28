@@ -11,7 +11,7 @@ router.use(checkAuth);
 router.use(statusCheck);
 
 router.post(
-  "/editprofile",
+  "/edituserprofile",
   roleCheck([
     roles.USER_ROLE.ADMIN,
     roles.USER_ROLE.PATIENT,
@@ -27,8 +27,35 @@ router.post(
     user.address = data.address != "" ? data.address : user.address || "";
     user.allergies =
       data.allergies != "" ? data.allergies : user.allergies || "";
+    user.location = data.location != "" ? data.location : user.location || "";
     try {
       const result = await db.updateUser(user);
+      return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+    }
+  }
+);
+router.post(
+  "/editorgprofile",
+  roleCheck([
+    roles.ORG_ROLE.HOSPITAL,
+    roles.ORG_ROLE.PHARMACY,
+    roles.ORG_ROLE.INSURANCE,
+  ]),
+  async (req, res) => {
+    let user = req.session.data.user;
+    const data = req.body;
+    user.name = data.name != "" ? data.name : user.name;
+    user.location = data.location != "" ? data.location : user.location;
+    user.contactDetails =
+      data.contactDetails != "" ? data.contactDetails : user.contactDetails;
+    user.description =
+      data.description != "" ? data.description : user.description;
+
+    try {
+      const result = await db.updateOrg(user);
       return res.redirect("/");
     } catch (err) {
       console.log(err);
@@ -57,7 +84,11 @@ router.get(
   roleCheck([roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {
-      const result = await db.getUsersByRole(roles.USER_ROLE.PROFESSIONAL);
+      const result = await db.search(
+        req.query.type,
+        req.query.name,
+        req.query.location
+      );
       req.session.data.professionals = result;
       return res.redirect("/");
     } catch (err) {
