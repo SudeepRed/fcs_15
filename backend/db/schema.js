@@ -99,7 +99,7 @@ export async function createDB() {
     CREATE TABLE IF NOT EXISTS USER_FILES (
       id BIGINT NOT NULL,
       filename varchar(50) NOT NULL,
-      hash varchar(512) UNIQUE NOT NULL,
+      hash varchar(512)  NOT NULL,
       PRIMARY KEY(id, filename, hash),
       CONSTRAINT fk_user_file_id
           FOREIGN KEY(id) 

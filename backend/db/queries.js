@@ -188,35 +188,22 @@ export async function approveApplication(id, type) {
     }
   }
 }
-export async function insertFile(type, id, filename, hash) {
-  if (type == "user") {
-    try {
-      const result = await client.query(
-        `INSERT INTO USER_FILES VALUES ($1,$2,$3)
-        ON CONFLICT (hash)
+export async function insertFile(id, filename, hash) {
+  try {
+    console.log(id, filename, hash);
+    const result = await client.query(
+      `INSERT INTO USER_FILES VALUES ($1,$2,$3)
+        ON CONFLICT (id, filename, hash)
         DO 
-          UPDATE SET hash = $3;`,
-        [id, filename, hash]
-      );
-      return result.rows;
-    } catch (err) {
-      console.log(err, "insertFile");
-      sysLogger.error(err);
-      return null;
-    }
-  }
-  if (type == "org") {
-    try {
-      const result = await client.query(
-        `INSERT INTO ORG_FILES VALUES ($1,$2);`,
-        [id, filename]
-      );
-      return result.rows;
-    } catch (err) {
-      console.log(err);
-      sysLogger.error(err);
-      return null;
-    }
+          UPDATE SET id = $1, filename = $2, hash = $3;`,
+      [id, filename, hash]
+    );
+    console.log("insertFile", result);
+    return result.rows;
+  } catch (err) {
+    console.log(err, "insertFile");
+    sysLogger.error(err);
+    return null;
   }
 }
 export async function updatePassphrase(pass, type, id) {
@@ -632,7 +619,9 @@ export async function refundAmount(id) {
       [id]
     );
 
-    return {msg: "Successfully refund the claim! Log in again to view Updated Wallet :)"};
+    return {
+      msg: "Successfully refund the claim! Log in again to view Updated Wallet :)",
+    };
   } catch (err) {
     console.log(err);
     sysLogger.error(err);
@@ -687,9 +676,12 @@ export async function insertHash(hash) {
 export async function getFileNameFromHash(hash) {
   try {
     const result = await client.query(
-      `SELECT filename FROM user_files WHERE hash = $1`,
+      `SELECT filename FROM user_files WHERE hash = $1
+      ORDER BY id DESC LIMIT 1;`,
       [hash]
     );
+    console.log(result.rows, "getFileNameFromHash");
+    if (result.rows.length == 0) return null;
     return result.rows[0].filename;
   } catch (err) {
     console.log(err);
@@ -697,12 +689,16 @@ export async function getFileNameFromHash(hash) {
     return null;
   }
 }
-export async function updateFileName(oldName, newName) {
+export async function updateFileName(id, newName, hash) {
   try {
-    const result = await client.query(
-      `UPDATE USER_FILES SET FILENAME = $2 WHERE FILENAME=$1;`,
-      [oldName, newName]
+    let result = await client.query(`DELETE FROM USER_FILES WHERE HASH = $1;`, [
+      hash,
+    ]);
+    result = await client.query(
+      ` INSERT INTO USER_FILES VALUES ($1, $2, $3);`,
+      [id, newName, hash]
     );
+    console.log("updateFileName");
     return;
   } catch (err) {
     console.log(err);

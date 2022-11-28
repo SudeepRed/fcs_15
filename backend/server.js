@@ -181,6 +181,13 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
             await db.insertPOI(id, req.file.filename, "user");
             res.redirect("/login");
           } else {
+            fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+              if (err) {
+                res.send("Oops! something went wrong!");
+              }
+              console.log("deleted for otp");
+              logger.info("Uploaded File deleted for wrong otp");
+            });
             return res.render("register.ejs", {
               message: "Role can only be patient or professional",
             });
@@ -194,6 +201,13 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
           });
         }
       } else {
+        fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+          if (err) {
+            res.send("Oops! something went wrong!");
+          }
+          console.log("deleted for otp");
+          logger.info("Uploaded File deleted for wrong otp");
+        });
         return res.render("register.ejs", {
           message: "Please enter the correct otp",
         });
@@ -233,6 +247,16 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
     }
 
     if (req.body.getOtp != undefined && req.body.register == undefined) {
+      req.files.forEach((file) => {
+        fs.unlink("./db/uploads/" + file, (err) => {
+          if (err) {
+            res.send("Oops! something went wrong!");
+          }
+          console.log("deleted for otp");
+          logger.info("Uploaded File deleted for otp");
+        });
+      });
+
       otp.sendMail(req.body.domain);
       console.log("otp sent");
       return;
@@ -267,6 +291,15 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
               // await db.insertPOI(id, req.file.filename, "user");
               res.redirect("/login");
             } else {
+              req.files.forEach((file) => {
+                fs.unlink("./db/uploads/" + file, (err) => {
+                  if (err) {
+                    res.send("Oops! something went wrong!");
+                  }
+                  console.log("deleted for otp");
+                  logger.info("Uploaded File deleted for otp");
+                });
+              });
               logger.error("Wrong ORG_ROLE!");
               return res.render("register.ejs", {
                 message: "Wrong ROLE!",
@@ -296,11 +329,21 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
               }
             });
           });
+
           return res.render("register.ejs", {
             message: "Something went wrong. Please try again.",
           });
         }
       } else {
+        req.files.forEach((file) => {
+          fs.unlink("./db/uploads/" + file, (err) => {
+            if (err) {
+              res.send("Oops! something went wrong!");
+            }
+            console.log("deleted for otp");
+            logger.info("Uploaded File deleted for otp");
+          });
+        });
         return res.render("register.ejs", {
           message: "Either OTP time expired or you have entered incorrect OTP!",
         });
@@ -411,27 +454,33 @@ app.post(
       const ipfsStop = await ipfs.stop();
       const verify = await db.verifyHash(hash.path);
       let sharedFileName = req.file.filename;
+      let result = await db.insertFile(
+        req.session.data.user.id,
+        sharedFileName,
+        hash.path
+      );
       if (!verify) {
-        let result = await db.insertFile(
-          req.session.data.user.type,
-          req.session.data.user.id,
-          req.file.filename,
-          hash.path
-        );
+        result = await db.insertHash(hash.path);
       } else {
         sharedFileName = await db.getFileNameFromHash(hash.path);
-        if (fs.existsSync("./db/uploads/" + sharedFileName)) {
-          fs.unlink("./db/uploads/" + req.file.filename, (err) => {
+        if (
+          sharedFileName != null &&
+          fs.existsSync("./db/uploads/" + sharedFileName)
+        ) {
+          fs.unlink("./db/uploads/" + sharedFileName, (err) => {
             if (err) {
               res.send("Oops! something went wrong!");
             }
             console.log("Deleted Duplicate File");
             logger.info("Deleted Duplicate File");
           });
-        } else {
-          await db.updateFileName(sharedFileName, req.file.filename);
-          sharedFileName = req.file.filename;
         }
+        await db.updateFileName(
+          req.session.data.user.id,
+          req.file.filename,
+          hash.path
+        );
+        sharedFileName = req.file.filename;
       }
 
       if (req.body.rid) {
@@ -468,6 +517,8 @@ app.get(
     role.USER_ROLE.PROFESSIONAL,
     role.USER_ROLE.PATIENT,
     role.ORG_ROLE.HOSPITAL,
+    role.ORG_ROLE.PHARMACY,
+    role.ORG_ROLE.INSURANCE,
   ]),
   async (req, res) => {
     try {
