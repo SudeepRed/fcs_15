@@ -106,12 +106,14 @@ router.post(
 );
 router.get(
   "/showtransactions",
-  roleCheck([roles.ORG_ROLE.PHARMACY]),
+  roleCheck([roles.ORG_ROLE.PHARMACY, roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {
-      const data = await db.getTransaction(req.session.data.user.id);
-      return res.send(data);
-      // return res.redirect("/");
+      const data = await db.getTransaction(
+        req.session.data.user.id,
+        req.session.data.user.role
+      );
+      return res.json(data);
     } catch (err) {
       console.log(err);
       logger.error(err);
@@ -135,12 +137,35 @@ router.post(
     }
   }
 );
-router.get(
-  "/showclaims",
-  roleCheck([roles.ORG_ROLE.INSURANCE]),
+router.post(
+  "/raiseClaim",
+  roleCheck([roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {
-      const data = await db.showClaims(req.session.data.user.id);
+      console.log(req);
+      const data = await db.raiseClaim(req.body.trid, req.body.vid);
+      if (data == null) {
+        return res.send(
+          "OOPS! Seems like the Claim cannot be initiated! Maybe try other ID's :) "
+        );
+      }
+      return res.send("Success");
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+    }
+  }
+);
+
+router.get(
+  "/showclaims",
+  roleCheck([roles.ORG_ROLE.INSURANCE, roles.USER_ROLE.PATIENT]),
+  async (req, res) => {
+    try {
+      const data = await db.showClaims(
+        req.session.data.user.id,
+        req.session.data.user.role
+      );
       req.session.data.claims = data;
       return res.send(data);
     } catch (err) {
@@ -155,7 +180,10 @@ router.post(
   async (req, res) => {
     try {
       const data = await db.refundAmount(req.body.id);
-      return res.send("done");
+      if (data == null) {
+        return { msg: "Oops! Something went wrong :(" };
+      }
+      return res.send(data);
     } catch (err) {
       console.log(err);
       logger.error(err);

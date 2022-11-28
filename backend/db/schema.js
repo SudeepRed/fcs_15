@@ -222,17 +222,18 @@ export async function createDB() {
   try {
     await client.query(`
     CREATE TABLE IF NOT EXISTS CLAIMS (
-      bid BIGINT NOT NULL,
-      mid int NOT NULL, 
-      time BIGINT PRIMARY KEY NOT NULL, 
+      uid BIGINT NOT NULL,
+      did BIGINT NOT NULL, 
+      id BIGINT PRIMARY KEY NOT NULL,
+      tid BIGINT NOT NULL,
       vid BIGINT NOT NULL,
       amount int not null,
       status status NOT NULL DEFAULT 'pending',
       CONSTRAINT fk_bid_claim
-              FOREIGN KEY(bid) 
+              FOREIGN KEY(uid) 
             REFERENCES users(id),
           CONSTRAINT fk_mid_claim
-              FOREIGN KEY(mid) 
+              FOREIGN KEY(did) 
             REFERENCES drugs(id),
       CONSTRAINT fk_vid_claim
               FOREIGN KEY(vid) 

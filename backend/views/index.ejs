@@ -45,16 +45,42 @@
     <div style="display:flex; flex-direction: row;">
       <div style="border-right: 4px  solid; padding: 15px">
         <% if ( typeof data.orgs !='undefined' ){ %>
-          <% data.orgs.forEach(function(org) { %>
-            <p>
-              <%= org.id %>
-                <%= org.name %>
-            </p>
-            <% }) %>
-              <% } %>
-                <form action="/user/getorgs" method="GET">
-                  <button type="submit">Get orgs</button>
-                </form>
+          <table>
+            <tr>
+              <th>Org ID</th>
+              <th>Org Name</th>
+              <th>Org Type</th>
+              <th>Org Address</th>
+              <th>Org Contact Details</th>
+              <th>Org Description</th>
+            </tr>
+            <% data.orgs.forEach(function(org) { %>
+              <tr>
+                <td>
+                  <%= org.id %>
+                </td>
+                <td>
+                  <%= org.name || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= org.role %>
+                </td>
+                <td>
+                  <%= org.address || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= org.contactDetails || "Not yet updated" %>
+                </td>
+                <td>
+                  <%= org.description || "Not yet updated" %>
+                </td>
+              </tr>
+              <% }) %>
+          </table>
+          <% } %>
+            <form action="/user/getorgs" method="GET">
+              <button type="submit">Get orgs</button>
+            </form>
       </div>
       <div>&nbsp;</div>
       <div>&nbsp;</div>
@@ -62,17 +88,35 @@
       <div>&nbsp;</div>
       <div>
         <% if ( typeof data.professionals !='undefined' ){ %>
-          <% data.professionals.forEach(function(professionals) { %>
-            <p>
-              <%= professionals.id %>
-                <%= professionals.name %>
+          <table>
+            <tr>
+              <th>Professional's ID</th>
+              <th>Professional's Name</th>
+              <th>Professional's Type</th>
+              <th>Professional's Address</th>
+            </tr>
+            <% data.professionals.forEach(function(professionals) { %>
+              <tr>
+
+                <td>
+                  <%= professionals.id %>
+                </td>
+                <td>
+                  <%= professionals.name %>
+                </td>
+                <td>
                   <%= professionals.role %>
-            </p>
-            <% }) %>
-              <% } %>
-                <form action="/user/getprofessionals" method="GET">
-                  <button type="submit">Get professionals</button>
-                </form>
+                </td>
+                <td>
+                  <%= professionals.address || "Not yet updated" %>
+                </td>
+              </tr>
+              <% }) %>
+          </table>
+          <% } %>
+            <form action="/user/getprofessionals" method="GET">
+              <button type="submit">Get professionals</button>
+            </form>
       </div>
     </div>
   </div>
@@ -288,6 +332,44 @@
 
     </div>
   </div>
+  <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+    <% if ( typeof data.user !='undefined' ){ %>
+      <% if(data.user.role=='patient' ) {%>
+        <form action="/user/showtransactions" method="GET">
+          <button type="submit">Show All my Medical transactions</button>
+        </form>
+        <div>
+          <form action="/user/showInsurance" method="GET">
+
+            <button type="submit">SHOW ALL Insurance COMPANIES</button>
+          </form>
+        </div>
+        <div>
+          <form action="/user/raiseClaim" method="POST">
+            <div>
+              <label for="trid">Enter Transaction ID</label>
+              <input type="number" id="updateField" name="trid" required />
+            </div>
+            <div>
+              <label for="trid">Enter Insurance Company ID</label>
+              <input type="number" id="updateField" name="vid" required />
+            </div>
+            <button type="submit">Raise Insurance Claim for this Transaction</button>
+          </form>
+        </div>
+
+        <form action="/user/showclaims" method="GET">
+
+          <button type="submit">
+            Show all PENDING Claims raised
+          </button>
+        </form>
+
+
+        <% }} %>
+  </div>
+
+
   <% if ( typeof data.user !='undefined' ){ %>
     <% if(data.user.role=='pharmacy' ) {%>
       <div>
