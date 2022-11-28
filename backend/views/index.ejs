@@ -69,6 +69,68 @@
   </div>
   <div class="club">
     <div style="display:flex; flex-direction: row;">
+      <div>
+
+        <div>
+          <% if ( typeof data.professionals !='undefined' ){ %>
+            <table>
+              <tr>
+                <th> ID</th>
+                <th> Name</th>
+                <th> Type</th>
+                <th> Address</th>
+                <th> Location</th>
+              </tr>
+              <% data.professionals.forEach(function(professionals) { %>
+                <tr>
+
+                  <td>
+                    <%= professionals.id %>
+                  </td>
+                  <td>
+                    <%= professionals.name %>
+                  </td>
+                  <td>
+                    <%= professionals.role %>
+                  </td>
+                  <td>
+                    <%= professionals.address || "Not yet updated" %>
+                  </td>
+                  <td>
+                    <%= professionals.location || "Not yet updated" %>
+                  </td>
+                </tr>
+                <% }) %>
+            </table>
+            <% } %>
+              <form action="/user/getprofessionals" method="GET">
+                <div>
+                  <label for="type">Type</label>
+                  <select name="type" id="type" required>
+                    <option value="all">All</option>
+                    <option value="hospital">Hospital</option>
+                    <option value="pharmacy">Pharmacy</option>
+                    <option value="insurance">Insurance</option>
+                    <option value="professional">Professional</option>
+                  </select>
+
+                </div>
+                <div>
+                  <label for="">Name</label>
+                  <input type="string" id="updateField" name="name" />
+                </div>
+                <div>
+                  <label for="">Location</label>
+                  <input type="string" id="updateField" name="location" />
+                </div>
+                <button type="submit">Get Catalog</button>
+              </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="club">
+    <div style="display:flex; flex-direction: row;">
       <form action="/addToWallet" method="POST">
         <div>
           <label for="name">Amount</label>
