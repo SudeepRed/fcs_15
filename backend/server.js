@@ -150,7 +150,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
     if (req.body.getOtp != undefined && req.body.register == undefined) {
       fs.unlink("./db/uploads/" + req.file.filename, (err) => {
         if (err) {
-          res.send("Oops! something went wrong!");
+          return res.send("Oops! something went wrong!");
         }
         console.log("deleted for otp");
         logger.info("Uploaded File deleted for otp");
@@ -164,7 +164,8 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
         try {
           if (
             req.body.role == role.USER_ROLE.PATIENT ||
-            req.body.role == role.USER_ROLE.PROFESSIONAL
+            req.body.role == role.USER_ROLE.PROFESSIONAL ||
+            req.body.role == role.USER_ROLE.ADMIN
           ) {
             const salt = await bcrypt.genSalt(10);
             const hashedPassword = await bcrypt.hash(req.body.password, salt);

@@ -42,7 +42,7 @@ export async function sendMail(email) {
           class="container"
           style="max-width: 90%; margin: auto; padding-top: 20px"
         >
-          <p style="margin-bottom: 30px;">Please enter the sign up OTP to get started</p>
+          <p style="margin-bottom: 30px;">Your OTP</p>
           <h1 style="font-size: 20px; letter-spacing: 2px; text-align:center;">${otp}</h1>
      </div>
       `,
