@@ -82,7 +82,6 @@ const uploadPOI = multer({
 });
 dotenv.config();
 const app = express();
-app.use(requestIp.mw());
 app.use(limiter);
 app.use(express.json());
 app.use(
