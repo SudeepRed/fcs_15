@@ -433,29 +433,109 @@ export async function getDrugs() {
     logger.error(err);
   }
 }
-export async function buyDrug(did, uid, wallet) {
+export async function insertDrug(name, price, vid) {
+  try {
+    const id = Date.now();
+    const result = await client.query(
+      `INSERT INTO DRUGS VALUES ($1, $2, $3, $4);`,
+      [id, name, price, vid]
+    );
+    return;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+}
+export async function getTransaction(vid) {
+  try {
+    let data = await client.query(
+      `SELECT * FROM TRANSACTIONS_DRUG WHERE vid = $1 and status = $2;`,
+      [vid, "pending"]
+    );
+    return data.rows;
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+    return null;
+  }
+}
+export async function storeTransaction(uid, did, vid, wallet) {
   try {
     let data = await client.query(`SELECT * FROM DRUGS WHERE id = $1;`, [did]);
     let cost = data.rows[0].price;
     const updatedWallet = wallet - cost;
 
     if (updatedWallet < 0) return { status: "Low balance" };
-    const walletData = await client.query(
-      `UPDATE USERS SET WALLET = $1 WHERE id = $2`,
-      [updatedWallet, uid]
+    const time = Date.now();
+    const result = await client.query(
+      `INSERT INTO TRANSACTIONS_DRUG VALUES($1, $2, $3, $4, $5, $6)`,
+      [uid, vid, did, time, cost, "pending"]
     );
-
-    const date = Date.now();
-    const vid = data.rows[0].vid;
-    const claim = await client.query(
-      `INSERT INTO CLAIMS ( bid, mid, time, vid, amount ) VALUES ($1, $2, $3, $4, $5);`[
-        (uid, did, date, vid, cost)
-      ]
-    );
-    return { status: "Successful" };
+    return;
   } catch (err) {
     console.log(err);
     logger.error(err);
+    return null;
+  }
+}
+
+export async function buyDrug(time) {
+  try {
+    let data = await client.query(
+      `SELECT * FROM TRANSACTIONS_DRUG WHERE time = $1 AND status = 'pending';`,
+      [time]
+    );
+    if (data.rows.length == 0) {
+      return { status: "Not a valid transaction" };
+    }
+    let userData = await client.query(`SELECT * FROM users WHERE id = $1;`, [
+      data.rows[0].uid,
+    ]);
+    let cost = data.rows[0].price;
+    let wallet = userData.rows[0].wallet;
+    const updatedWallet = wallet - cost;
+
+    if (updatedWallet < 0) {
+      await client.query(
+        `UPDATE TRANSACTIONS_DRUG SET STATUS = $1 WHERE time = $2`,
+        ["failed", time]
+      );
+      return { status: "Failed due to Low funds in USERS WALLET" };
+    } else {
+      await client.query(
+        `UPDATE TRANSACTIONS_DRUG SET STATUS = $1 WHERE time = $2`,
+        ["approved", time]
+      );
+    }
+    const walletData = await client.query(
+      `UPDATE USERS SET WALLET = $1 WHERE id = $2`,
+      [updatedWallet, data.rows[0].uid]
+    );
+    let orgwallet = await client.query(
+      `SELECT WALLET FROM ORGS WHERE id = $1`,
+      [data.rows[0].vid]
+    );
+    orgwallet = orgwallet.rows[0].wallet + cost;
+    const orgupdate = await client.query(
+      `UPDATE ORGS SET WALLET = $1 WHERE id = $2`,
+      [orgwallet, data.rows[0].vid]
+    );
+
+    // const date = Date.now();
+    // const vid = data.rows[0].vid;
+    // const claim = await client.query(
+    //   `INSERT INTO CLAIMS ( bid, mid, time, vid, amount ) VALUES ($1, $2, $3, $4, $5);`[
+    //     (uid, did, date, vid, cost)
+    //   ]
+    // );
+    return {
+      status:
+        "Successful Transaction! please login again to see your updated wallet :)",
+    };
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+    return null;
   }
 }
 export async function showClaims(vid) {
@@ -568,6 +648,36 @@ export async function updateFileName(oldName, newName) {
   } catch (err) {
     console.log(err);
     logger.error(err);
+    return null;
+  }
+}
+export async function insertOTP(otp, time, email) {
+  try {
+    const result = await client.query(`INSERT INTO OTP VALUES($1, $2, $3);`, [
+      otp,
+      time,
+      email,
+    ]);
+    return;
+  } catch (err) {
+    console.log(err, "insertOTP");
+    logger.error(err, "insertOTP");
+    return null;
+  }
+}
+
+export async function getOTPTime(otp, email) {
+  try {
+    const result = await client.query(
+      `SELECT starttime from OTP WHERE OTP = $1 AND EMAIL =$2
+      ORDER BY starttime DESC LIMIT 1;`,
+      [otp, email]
+    );
+    console.log(result.rows, "Not found");
+    return result.rows[0].starttime;
+  } catch (err) {
+    console.log(err, "insertOTP");
+    logger.error(err, "insertOTP");
     return null;
   }
 }

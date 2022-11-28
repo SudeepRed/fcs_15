@@ -2,6 +2,9 @@ import nodemailer from "nodemailer";
 import dotenv from "dotenv";
 import Cryptr from "cryptr";
 import * as logs from "logger";
+import * as otpGenerator from "otp-generator";
+import * as db from "../db/queries.js";
+
 let logger = logs.createLogger("./Bhamlo.log");
 dotenv.config();
 const MAIL_SETTINGS = {
@@ -17,13 +20,19 @@ const transporter = nodemailer.createTransport(MAIL_SETTINGS);
 
 //add a secret value to time
 function genrateOtp() {
-  const otp = cryptr.encrypt(Date.now());
+  const otp = otpGenerator.generate(6, {
+    upperCaseAlphabets: false,
+    specialChars: false,
+  });
+  console.log(otp);
   return otp;
 }
 
 export async function sendMail(email) {
   const otp = genrateOtp();
+  const time = Date.now();
   try {
+    await db.insertOTP(otp, time, email);
     let info = await transporter.sendMail({
       from: MAIL_SETTINGS.auth.email,
       to: email,
@@ -38,6 +47,7 @@ export async function sendMail(email) {
      </div>
       `,
     });
+    logger.info("EMAIL OTP SENT", info);
     return info;
   } catch (err) {
     console.log(err);
@@ -46,21 +56,25 @@ export async function sendMail(email) {
   }
 }
 //remove the secret value
-export function verifyOtp(otp) {
+export async function verifyOtp(otp, email) {
   if (otp != undefined) {
     try {
-      const time = cryptr.decrypt(otp);
+      const time = await db.getOTPTime(otp, email);
+      console.log(time);
       const currTime = Date.now();
       const difftime = currTime - time;
-      if (difftime <= 600000) {
+      if (difftime <= 60000 * 2) {
         return true;
       } else {
+        logger.error("Either OTP time expired!", email);
         return false;
       }
     } catch (err) {
       return false;
     }
   } else {
+    console.log("otp wrong");
+    logger.error("Wrong OTP!", email);
     return false;
   }
 }

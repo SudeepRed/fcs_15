@@ -20,6 +20,7 @@ import * as IPFS from "ipfs-core";
 import * as logs from "logger";
 import rateLimit from "express-rate-limit";
 import * as requestIp from "request-ip";
+import { statusCheck } from "./controllers/status.js";
 let logger = logs.createLogger("Bhamlo.log");
 
 const limiter = rateLimit({
@@ -111,7 +112,7 @@ app.get(
     res.render("health.ejs");
   }
 );
-app.get("/", auth.checkAuth, (req, res) => {
+app.get("/", auth.checkAuth, statusCheck, (req, res) => {
   res.render("index.ejs", { data: req.session.data });
 });
 app.get("/login", auth.checkNotAuth, (req, res) => {
@@ -233,10 +234,11 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
 
     if (req.body.getOtp != undefined && req.body.register == undefined) {
       otp.sendMail(req.body.domain);
+      console.log("otp sent");
       return;
     }
     if (req.body.register != undefined && req.body.getOtp == undefined) {
-      if (otp.verifyOtp(req.body.otp)) {
+      if (await otp.verifyOtp(req.body.otp, req.body.domain)) {
         try {
           {
             const salt = await bcrypt.genSalt(10);
@@ -299,9 +301,8 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
           });
         }
       } else {
-        logger.error("Wrong ORG OTP!");
         return res.render("register.ejs", {
-          message: "Please enter the correct otp",
+          message: "Either OTP time expired or you have entered incorrect OTP!",
         });
       }
     }

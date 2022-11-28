@@ -25,7 +25,9 @@ export async function validateUser(req, res, next) {
         .json({ message: "Invalid Password for the given Email/Domain" });
     }
   } catch (err) {
-    return res.status(403).json({ message: e });
+    console.log(err);
+    logger.error(err);
+    return res.status(403).json({ message: "opps! the user doesnt exist" });
   }
 }
 export function checkAuth(req, res, next) {

@@ -10,7 +10,6 @@ export const router = express.Router();
 router.use(checkAuth);
 router.use(statusCheck);
 
-
 router.post(
   "/editprofile",
   roleCheck([
@@ -70,7 +69,11 @@ router.get(
 
 router.get(
   "/showdrugs",
-  roleCheck([roles.USER_ROLE.PATIENT]),
+  roleCheck([
+    roles.USER_ROLE.PATIENT,
+    roles.ORG_ROLE.PHARMACY,
+    roles.ORG_ROLE.HOSPITAL,
+  ]),
   async (req, res) => {
     try {
       const result = await db.getDrugs();
@@ -87,12 +90,44 @@ router.post(
   roleCheck([roles.USER_ROLE.PATIENT]),
   async (req, res) => {
     try {
-      const data = await db.buyDrug(
-        req.body.id,
+      const data = await db.storeTransaction(
         req.session.data.user.id,
+        req.body.did,
+        req.body.vid,
         req.session.data.user.wallet
       );
+      return res.send("Transaction Queued, waiting for Pharmacy approval!");
+      // return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+    }
+  }
+);
+router.get(
+  "/showtransactions",
+  roleCheck([roles.ORG_ROLE.PHARMACY]),
+  async (req, res) => {
+    try {
+      const data = await db.getTransaction(req.session.data.user.id);
       return res.send(data);
+      // return res.redirect("/");
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+    }
+  }
+);
+router.post(
+  "/approvetransaction",
+  roleCheck([roles.ORG_ROLE.PHARMACY]),
+  async (req, res) => {
+    try {
+      const data = await db.buyDrug(req.body.id);
+      if (data != null) {
+        return res.send(data);
+      }
+
       // return res.redirect("/");
     } catch (err) {
       console.log(err);
@@ -121,6 +156,22 @@ router.post(
     try {
       const data = await db.refundAmount(req.body.id);
       return res.send("done");
+    } catch (err) {
+      console.log(err);
+      logger.error(err);
+    }
+  }
+);
+router.post(
+  "/addDrug",
+  roleCheck([roles.ORG_ROLE.PHARMACY]),
+  async (req, res) => {
+    try {
+      const drugName = req.body.name;
+      const price = req.body.price;
+      const vid = req.session.data.user.id;
+      const data = await db.insertDrug(drugName, price, vid);
+      return res.send("Added Drug");
     } catch (err) {
       console.log(err);
       logger.error(err);

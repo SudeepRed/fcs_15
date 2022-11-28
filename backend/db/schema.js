@@ -38,7 +38,9 @@ export async function createDB() {
       location text DEFAULT '',
       contactDetails text DEFAULT '',
       pass varchar(100)
-    );`);
+    );
+    ALTER TABLE ORGS
+    ADD IF NOT EXISTS WALLET INT DEFAULT 100;`);
   } catch (err) {
     console.log(err);
     logger.error(err);
@@ -120,7 +122,7 @@ export async function createDB() {
     );
     `);
   } catch (err) {
-    console.log(err,"user_files");
+    console.log(err, "user_files");
     logger.error(err);
   }
   try {
@@ -201,6 +203,24 @@ export async function createDB() {
   }
   try {
     await client.query(`
+    CREATE TABLE IF NOT EXISTS TRANSACTIONS_DRUG(
+      uid bigint not null,
+      vid bigint not null,
+      did varchar(50) not null,
+      time bigint UNIQUE not null,
+      price int  not null,
+      status varchar(50) NOT NULL DEFAULT 'pending',
+      PRIMARY KEY(time)
+      
+      
+    )
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+  try {
+    await client.query(`
     CREATE TABLE IF NOT EXISTS CLAIMS (
       bid BIGINT NOT NULL,
       mid int NOT NULL, 
@@ -233,6 +253,18 @@ export async function createDB() {
       PRIMARY KEY (id, filename, type)
       )
 
+    `);
+  } catch (err) {
+    console.log(err);
+    logger.error(err);
+  }
+  try {
+    await client.query(`
+    CREATE TABLE IF NOT EXISTS OTP (
+      otp varchar(10) NOT NULL,
+      starttime bigint NOT NULL,
+      email varchar(100) NOT NULL
+      );
     `);
   } catch (err) {
     console.log(err);

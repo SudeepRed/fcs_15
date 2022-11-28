@@ -48,7 +48,7 @@
           <% data.orgs.forEach(function(org) { %>
             <p>
               <%= org.id %>
-              <%= org.name %>
+                <%= org.name %>
             </p>
             <% }) %>
               <% } %>
@@ -235,37 +235,37 @@
             </div>
             <div>
             </div>
-            
 
-              <button type="submit">Upload To Verify</button>
+
+            <button type="submit">Upload To Verify</button>
           </form>
           <% }} %>
-          <form action="/share" method="POST" enctype="multipart/form-data"
-            style="border-right: 4px  solid; padding: 15px">
-            <div>
-              <label for="id">Choose File</label>
-              <input type="file" id="updateField" name="upload" required />
-            </div>
-            <div>
-              <label for="id">Enter id to share file</label>
-              <input type="text" id="updateField" name="rid" required />
-            </div>
-            <div>
-              <label for="type">Select Type</label>
-              <select name="type" id="type" required>
-                <option value="org">Organization</option>
-                <option value="user">User</option>
-              </select>
-            </div>
+            <form action="/share" method="POST" enctype="multipart/form-data"
+              style="border-right: 4px  solid; padding: 15px">
+              <div>
+                <label for="id">Choose File</label>
+                <input type="file" id="updateField" name="upload" required />
+              </div>
+              <div>
+                <label for="id">Enter id to share file</label>
+                <input type="text" id="updateField" name="rid" required />
+              </div>
+              <div>
+                <label for="type">Select Type</label>
+                <select name="type" id="type" required>
+                  <option value="org">Organization</option>
+                  <option value="user">User</option>
+                </select>
+              </div>
 
-            <button type="submit">Share</button>
-          </form>
+              <button type="submit">Share</button>
+            </form>
 
-          <form action="/getFiles" method="GET" style="padding: 15px">
-            <button type="submit">
-              Download All Documents Shared with Me !
-            </button>
-          </form>
+            <form action="/getFiles" method="GET" style="padding: 15px">
+              <button type="submit">
+                Download All Documents Shared with Me !
+              </button>
+            </form>
     </div>
   </div>
 
@@ -288,47 +288,94 @@
 
     </div>
   </div>
-  <div>
-    <% if ( typeof data.drugs !='undefined' ){ %>
-      <% data.drugs.forEach(function(drug) { %>
-        <p>
-          <%= drug.id %>
-            <%= drug.name %>
-              <%= drug.price %>
-        </p>
-        <% }) %>
-          <% } %>
-            <form action="/user/showdrugs" method="GET">
-              <button type="submit">SHOW DRUGS</button>
-            </form>
-            <form action="/user/buydrug" method="POST">
-              <div>
-                <label for="drug">ENTER DRUG ID TO PRUCHASE</label>
-                <input type="number" id="updateField" name="id" required />
-              </div>
-              <button type="submit">BUY DRUG</button>
-            </form>
-  </div>
   <% if ( typeof data.user !='undefined' ){ %>
-    <% if(data.user.role=='insurance' ) {%>
-      <form action="/user/showclaims" method="GET">
+    <% if(data.user.role=='pharmacy' ) {%>
+      <div>
+        <form action="/user/showtransactions" method="GET">
 
-        <button type="submit">
-          Show all PENDING Claims raised
-        </button>
-      </form>
-      <form action="/user/refund" method="POST">
-        <div>
-          <label for="id">Enter Claim ID</label>
-          <input type="number" id="updateField" name="id" />
-        </div>
+          <button type="submit">Show All Medicinal transactions</button>
 
-        <button type="submit">
-          <h3>Refund Claim</h3>
-        </button>
-      </form>
+        </form>
+      </div>
+      <div>
+        <form action="/user/approvetransaction" method="POST">
+          <div>
+            <label for="drug">Enter Transaction ID</label>
+            <input type="string" id="updateField" name="id" required />
+          </div>
+          <button type="submit">Approve this transaction</button>
+
+        </form>
+      </div>
       <% }} %>
+        <div class="club">
+          <div style="max-width:50vw;display:flex; justify-content: space-around; flex-direction: row;">
+            <% if ( typeof data.user !='undefined' ){ %>
+              <% if(data.user.role=='pharmacy' ) {%>
+                <div>
+                  <form action="/user/addDrug" method="POST" style="border-right: 4px  solid; padding: 15px">
+                    <div>
+                      <label for="drug">Name of the Drug</label>
+                      <input type="string" id="updateField" name="name" required />
+                    </div>
+                    <div>
+                      <label for="drug">Price</label>
+                      <input type="number" id="updateField" name="price" required />
+                    </div>
+                    <button type="submit">Add drug</button>
 
+                  </form>
+                </div>
+                <% }} %>
+                  <div style="border-right: 4px  solid; padding: 15px">
+                    <% if ( typeof data.drugs !='undefined' ){ %>
+                      <% data.drugs.forEach(function(drug) { %>
+                        <p>
+                          DRUG ID: <%= drug.id %>
+                            DRUG NAME:<%= drug.name %>
+                              DRUG PRICE:<%= drug.price %>
+                                VENDOR ID: <%= drug.vid %>
+                        </p>
+                        <% }) %>
+                          <% } %>
+                            <form action="/user/showdrugs" method="GET">
+                              <button type="submit">SHOW DRUGS</button>
+                            </form>
+                  </div>
+                  <form action="/user/buydrug" method="POST">
+                    <div>
+                      <label for="drug">ENTER DRUG ID TO PRUCHASE</label>
+                      <input type="number" id="updateField" name="did" required />
+                    </div>
+                    <div>
+                      <label for="drug">ENTER VENDOR ID TO PRUCHASE</label>
+                      <input type="number" id="updateField" name="vid" required />
+                    </div>
+                    <button type="submit">BUY DRUG</button>
+                  </form>
+          </div>
+        </div>
+        <div>
+          <% if ( typeof data.user !='undefined' ){ %>
+            <% if(data.user.role=='insurance' ) {%>
+              <form action="/user/showclaims" method="GET">
+
+                <button type="submit">
+                  Show all PENDING Claims raised
+                </button>
+              </form>
+              <form action="/user/refund" method="POST">
+                <div>
+                  <label for="id">Enter Claim ID</label>
+                  <input type="number" id="updateField" name="id" />
+                </div>
+
+                <button type="submit">
+                  <h3>Refund Claim</h3>
+                </button>
+              </form>
+              <% }} %>
+        </div>
         <form action="/logout" method="POST">
           <button type="submit">
             <h1>Log Out</h1>
