@@ -48,6 +48,7 @@ export async function sendMail(email) {
       `,
     });
     logger.info("EMAIL OTP SENT", info);
+    console.log(info)
     return info;
   } catch (err) {
     console.log(err);

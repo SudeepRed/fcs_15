@@ -159,7 +159,7 @@ app.post("/registeruser", auth.checkNotAuth, async (req, res) => {
     }
 
     if (req.body.register != undefined && req.body.getOtp == undefined) {
-      if (otp.verifyOtp(req.body.otp)) {
+      if (otp.verifyOtp(req.body.otp, req.body.email)) {
         try {
           if (
             req.body.role == role.USER_ROLE.PATIENT ||
@@ -234,13 +234,18 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
     }
     if (req.files.length < 2) {
       req.files.forEach((file) => {
-        fs.unlink("./db/uploads/" + file.filename, (err) => {
-          if (err) {
-            res.send("Oops! something went wrong!");
-          }
-          console.log("Uploaded File deleted for org, min 2 files required");
-          logger.info("Uploaded File deleted for org, min 2 files required");
-        });
+        try {
+          fs.unlink("./db/uploads/" + file.filename, (err) => {
+            if (err) {
+              res.send("Oops! something went wrong!");
+              console.log(err);
+            }
+            console.log("Uploaded File deleted for org, min 2 files required");
+            logger.info("Uploaded File deleted for org, min 2 files required");
+          });
+        } catch (err) {
+          console.log(err);
+        }
       });
 
       return res.status(400).json({ error: "Minimum of 2 img is required" });
@@ -248,13 +253,18 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
 
     if (req.body.getOtp != undefined && req.body.register == undefined) {
       req.files.forEach((file) => {
-        fs.unlink("./db/uploads/" + file, (err) => {
-          if (err) {
-            res.send("Oops! something went wrong!");
-          }
-          console.log("deleted for otp");
-          logger.info("Uploaded File deleted for otp");
-        });
+        try {
+          fs.unlink("./db/uploads/" + file.filename, (err) => {
+            if (err) {
+              res.send("Oops! something went wrong!");
+              console.log(err);
+            }
+            console.log("Uploaded File deleted for org, min 2 files required");
+            logger.info("Uploaded File deleted for org, min 2 files required");
+          });
+        } catch (err) {
+          console.log(err);
+        }
       });
 
       otp.sendMail(req.body.domain);
@@ -292,7 +302,7 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
               res.redirect("/login");
             } else {
               req.files.forEach((file) => {
-                fs.unlink("./db/uploads/" + file, (err) => {
+                fs.unlink("./db/uploads/" + file.filename, (err) => {
                   if (err) {
                     res.send("Oops! something went wrong!");
                   }
@@ -336,7 +346,7 @@ app.post("/registerorg", auth.checkNotAuth, async (req, res) => {
         }
       } else {
         req.files.forEach((file) => {
-          fs.unlink("./db/uploads/" + file, (err) => {
+          fs.unlink("./db/uploads/" + file.filename, (err) => {
             if (err) {
               res.send("Oops! something went wrong!");
             }
